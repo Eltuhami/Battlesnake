@@ -1,5 +1,3 @@
-package com.battlesnake.starter;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -11,41 +9,52 @@ import static spark.Spark.*;
 
 /**
  * GODMODE SNAKE v16.0 - DOMINANT PREDATOR
- * 
- * More aggressive, smarter, and dominant:
- * - Aggressive food hunting in early game
- * - Territory control & expansion
- * - Smart kill opportunities
- * - Better space management
- * - Dominant hunting when larger
+ * Optimized for Replit deployment
  */
-public class Snake {
+public class Main {
     private static final ObjectMapper JSON = new ObjectMapper();
-    private static final Logger LOG = LoggerFactory.getLogger(Snake.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
     private static final int[][] DIRS = {{0,1},{0,-1},{-1,0},{1,0}};
     private static final String[] DIR_NAMES = {"up", "down", "left", "right"};
 
     public static void main(String[] args) {
-        String port = System.getProperty("PORT", "8082");
-        port(Integer.parseInt(port));
-        get("/", (req, res) -> JSON.writeValueAsString(index()));
-        post("/start", (req, res) -> "{}");
-        post("/move", (req, res) -> JSON.writeValueAsString(move(JSON.readTree(req.body()))));
-        post("/end", (req, res) -> "{}");
+        // Replit uses PORT environment variable
+        String portStr = System.getenv("PORT");
+        if (portStr == null) portStr = "8080";
+        int portNum = Integer.parseInt(portStr);
+        
+        port(portNum);
+        get("/", (req, res) -> {
+            res.type("application/json");
+            return JSON.writeValueAsString(index());
+        });
+        post("/start", (req, res) -> {
+            res.type("application/json");
+            return "{}";
+        });
+        post("/move", (req, res) -> {
+            res.type("application/json");
+            return JSON.writeValueAsString(move(JSON.readTree(req.body())));
+        });
+        post("/end", (req, res) -> {
+            res.type("application/json");
+            return "{}";
+        });
+        
+        System.out.println("GODMODE Snake running on port " + portNum);
     }
 
     static Map<String, String> index() {
         Map<String, String> r = new HashMap<>();
         r.put("apiversion", "1");
         r.put("author", "GODMODE");
-        r.put("color", "#FF0000"); // Blood Red - Dominant
+        r.put("color", "#FF0000");
         r.put("head", "evil");
         r.put("tail", "sharp");
         return r;
     }
 
     static Map<String, String> move(JsonNode r) {
-        // ============ PARSE ============
         int W = r.get("board").get("width").asInt();
         int H = r.get("board").get("height").asInt();
         int turn = r.get("turn").asInt();
@@ -59,7 +68,6 @@ public class Snake {
         int tailX = myBody.get(len - 1).get("x").asInt();
         int tailY = myBody.get(len - 1).get("y").asInt();
         
-        // ============ GAME MODE ============
         String gameMode = "standard";
         int hazardDamage = 15;
         JsonNode game = r.get("game");
@@ -80,7 +88,6 @@ public class Snake {
         boolean isRoyale = gameMode.contains("royale");
         boolean isWrapped = gameMode.contains("wrapped");
         
-        // ============ BUILD MAPS ============
         boolean[][] blocked = new boolean[W][H];
         boolean[][] hazard = new boolean[W][H];
         List<int[]> enemies = new ArrayList<>();
@@ -101,12 +108,10 @@ public class Snake {
                 int ey = snake.get("head").get("y").asInt();
                 enemies.add(new int[]{ex, ey, sLen, sHp});
                 if (sLen > maxEnemyLen) maxEnemyLen = sLen;
-                
                 if (sLen < len) smallerEnemies.add(new int[]{ex, ey, sLen, sHp});
                 else biggerEnemies.add(new int[]{ex, ey, sLen, sHp});
             }
             
-            // Mark body
             int startIdx = isMe ? 1 : 0;
             for (int j = startIdx; j < sLen - 1; j++) {
                 int bx = bodyArr.get(j).get("x").asInt();
@@ -114,7 +119,6 @@ public class Snake {
                 if (valid(bx, by, W, H)) blocked[bx][by] = true;
             }
             
-            // Tail stays if just ate
             if (sLen >= 2) {
                 int t1x = bodyArr.get(sLen-1).get("x").asInt(), t1y = bodyArr.get(sLen-1).get("y").asInt();
                 int t2x = bodyArr.get(sLen-2).get("x").asInt(), t2y = bodyArr.get(sLen-2).get("y").asInt();
@@ -122,7 +126,6 @@ public class Snake {
             }
         }
         
-        // Hazards
         JsonNode hazards = r.get("board").get("hazards");
         if (hazards != null) {
             for (JsonNode h : hazards) {
@@ -135,7 +138,6 @@ public class Snake {
         }
         boolean inHazard = hazard[hx][hy];
         
-        // Food sorted by distance
         List<int[]> foods = new ArrayList<>();
         for (JsonNode f : r.get("board").get("food")) {
             int fx = f.get("x").asInt(), fy = f.get("y").asInt();
@@ -143,9 +145,7 @@ public class Snake {
         }
         foods.sort((a, b) -> a[2] - b[2]);
         
-        // ============ GAME STATE ============
         boolean earlyGame = turn < 30;
-        boolean midGame = turn >= 30 && turn < 100;
         boolean lateGame = turn >= 100 || aliveEnemies <= 2;
         boolean endGame = aliveEnemies <= 1;
         boolean desperate = hp < 15;
@@ -157,7 +157,6 @@ public class Snake {
         
         int myTerritory = flood(hx, hy, W, H, blocked, hazard, hp > 40 && !isMaze, isMaze);
         
-        // ============ FIND MOVES ============
         List<int[]> safeMoves = new ArrayList<>();
         List<int[]> riskyMoves = new ArrayList<>();
         List<int[]> desperateMoves = new ArrayList<>();
@@ -185,7 +184,6 @@ public class Snake {
             return res;
         }
         
-        // ============ EVALUATE ============
         String bestMove = null;
         int bestScore = Integer.MIN_VALUE;
         
@@ -196,14 +194,12 @@ public class Snake {
             if (tier.equals("D")) score -= 500000;
             if (tier.equals("R")) score -= 20000;
             
-            // === 1. SPACE (Critical) ===
             int space = flood(nx, ny, W, H, blocked, hazard, hp > 40 && !isMaze, isMaze);
             if (space < len) score -= 999999;
             else if (space < len + 3) score -= 150000;
             else if (space < len * 2) score -= 50000;
             else score += space * 25;
             
-            // === 2. ESCAPE ROUTES ===
             int escapes = 0;
             for (int[] d : DIRS) {
                 int ex = nx + d[0], ey = ny + d[1];
@@ -214,21 +210,18 @@ public class Snake {
             else if (escapes == 1) score -= 40000;
             else score += escapes * 4000;
             
-            // === 3. HAZARD ===
             if (hazard[nx][ny] && !isMaze) {
                 int hpAfter = hp - hazardDamage;
                 if (hpAfter <= 0) score -= 999999;
                 else if (hp > 70) score -= 60000;
                 else if (hp > 50) score -= 40000;
                 else score -= 15000;
-                
                 for (int[] f : foods) {
                     if (f[0] == nx && f[1] == ny) score += 55000;
                 }
             }
             if (inHazard && !hazard[nx][ny]) score += 80000;
             
-            // === 4. HEAD COLLISION ===
             for (int[] en : biggerEnemies) {
                 int dist = Math.abs(nx - en[0]) + Math.abs(ny - en[1]);
                 if (dist == 1) score -= 120000;
@@ -243,34 +236,28 @@ public class Snake {
                     if (en[3] < 25) killBonus += 20000;
                     score += killBonus;
                 } else if (dist == 2 && dominant) {
-                    score += 15000; // Chase!
+                    score += 15000;
                 }
             }
             
-            // === 5. FOOD (Aggressive in early game) ===
             if (desperate || critical || hungry || earlyGame) {
                 if (!foods.isEmpty()) {
                     int[] closest = foods.get(0);
                     int dist = Math.abs(nx - closest[0]) + Math.abs(ny - closest[1]);
-                    
                     int urgency;
                     if (desperate) urgency = 2000;
                     else if (critical) urgency = 1000;
-                    else if (earlyGame) urgency = 800; // GROW FAST!
+                    else if (earlyGame) urgency = 800;
                     else if (hungry) urgency = 500;
                     else urgency = 200;
-                    
                     score += (35 - dist) * urgency;
-                    
                     if (nx == closest[0] && ny == closest[1]) score += urgency * 5;
                 }
             }
             
-            // === 6. TAIL ===
             int tailDist = Math.abs(nx - tailX) + Math.abs(ny - tailY);
             score += (25 - tailDist) * 200;
             
-            // === 7. ANTI-SANDWICH ===
             int threats = 0;
             for (int[] d : DIRS) {
                 int cx = nx + d[0], cy = ny + d[1];
@@ -282,11 +269,9 @@ public class Snake {
             }
             if (threats >= 2) score -= 30000;
             
-            // === 8. CENTER ===
             int centerDist = Math.abs(nx - W/2) + Math.abs(ny - H/2);
             score += (W + H - centerDist) * (isRoyale ? 30 : 15);
             
-            // === 9. TRAP SMALLER ENEMIES ===
             if (dominant && !smallerEnemies.isEmpty()) {
                 blocked[nx][ny] = true;
                 for (int[] en : smallerEnemies) {
@@ -297,7 +282,6 @@ public class Snake {
                 blocked[nx][ny] = false;
             }
             
-            // === 10. HUNT SMALLER ENEMIES ===
             if (dominant && !smallerEnemies.isEmpty()) {
                 for (int[] en : smallerEnemies) {
                     int dist = Math.abs(nx - en[0]) + Math.abs(ny - en[1]);
@@ -305,7 +289,6 @@ public class Snake {
                 }
             }
             
-            // === 11. WALL/CORNER PRESSURE ===
             for (int[] en : smallerEnemies) {
                 int enEdge = Math.min(Math.min(en[0], W-1-en[0]), Math.min(en[1], H-1-en[1]));
                 if (enEdge <= 2) {
@@ -314,7 +297,6 @@ public class Snake {
                 }
             }
             
-            // === 12. TERRITORY CUTOFF ===
             if (largest && myTerritory > 0) {
                 for (int[] en : enemies) {
                     blocked[nx][ny] = true;
@@ -324,7 +306,6 @@ public class Snake {
                 }
             }
             
-            // === 13. AVOID BIGGER ENEMIES ===
             if (beingHunted) {
                 int minBiggerDist = 999;
                 for (int[] en : biggerEnemies) {
@@ -334,7 +315,6 @@ public class Snake {
                 score += minBiggerDist * 10000;
             }
             
-            // === 14. ROYALE ===
             if (isRoyale && !hazard[nx][ny]) {
                 int ring = Math.min(turn / 20, Math.min(W, H) / 2 - 1);
                 int edge = Math.min(Math.min(nx, W-1-nx), Math.min(ny, H-1-ny));
@@ -342,7 +322,6 @@ public class Snake {
                 else score += edge * 400;
             }
             
-            // === 15. LOOKAHEAD ===
             if (score > -100000) {
                 score += lookahead(nx, ny, W, H, blocked, hazard, enemies, len, hp, isMaze, isWrapped) / 3;
             }
@@ -357,8 +336,7 @@ public class Snake {
         if (bestMove == null) bestMove = "up";
         
         String status = dominant ? "D" : (largest ? "L" : (beingHunted ? "H" : "-"));
-        LOG.info("T{} HP:{} L:{} {}[{}]:{} → {} ({})", 
-                 turn, hp, len, tier, status, myTerritory, bestMove, bestScore);
+        LOG.info("T{} HP:{} L:{} {}[{}]:{} -> {} ({})", turn, hp, len, tier, status, myTerritory, bestMove, bestScore);
         
         Map<String, String> result = new HashMap<>();
         result.put("move", bestMove);
@@ -381,14 +359,11 @@ public class Snake {
             int space = flood(nx, ny, W, H, nb, hazard, hp > 50 && !isMaze, isMaze);
             if (space < len) s -= 80000;
             else s += space * 12;
-            
             if (!isMaze && hazard[nx][ny]) s -= 15000;
-            
             for (int[] en : enemies) {
                 int dist = Math.abs(nx - en[0]) + Math.abs(ny - en[1]);
                 if (dist <= 1 && en[2] >= len) s -= 40000;
             }
-            
             if (s > best) best = s;
         }
         return best == Integer.MIN_VALUE ? -20000 : best;

@@ -1,0 +1,8 @@
+run = "mvn compile exec:java -Dexec.mainClass=Main -q"
+entrypoint = "Main.java"
+
+[nix]
+channel = "stable-22_11"
+
+[env]
+PORT = "8080"
