@@ -213,13 +213,19 @@ public class Snake {
             if (!foods.isEmpty()) {
                 double bestFoodScore = -1;
                 for (Point f : foods) {
+                    // BFS distance from HEAD (not next move nx,ny) + 1 step
                     int dist = bfsDist(nx, ny, f.x, f.y, W, H, blocked, isWrapped);
+                    
                     if (dist == -1) continue; // Unreachable
                     
+                    // Fix: Clamp distance to avoid division by zero or Infinity
+                    // If dist is 0 (we are ON food), treat as 1 (immediate reward)
+                    double safeDist = Math.max(1.0, (double)dist);
+
                     double foodVal = 0;
-                    if (starving) foodVal = 50000.0 / dist;
-                    else if (hungry || smallest) foodVal = 2000.0 / dist;
-                    else foodVal = 500.0 / dist;
+                    if (starving) foodVal = 50000.0 / safeDist;
+                    else if (hungry || smallest) foodVal = 2000.0 / safeDist;
+                    else foodVal = 500.0 / safeDist;
                     
                     // Safety: Is this food close to a big enemy?
                     for (Enemy e : enemies) {
