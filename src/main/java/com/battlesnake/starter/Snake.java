@@ -225,10 +225,9 @@ public class Snake {
 
                     double foodVal = 0;
                     if (isConstrictor) {
-                         // CONSTRICTOR MODE: Food is less important unless health is critical
-                         // Increased threshold to 30 because games can be long
-                         if (myHealth < 30) foodVal = 50000.0 / safeDist;
-                         else foodVal = 100.0 / safeDist; // Minimal interest
+                         // CONSTRICTOR MODE: No food exists, or if it does, it's irrelevant. 
+                         // Just in case some variant has it, we ignore it completely.
+                         foodVal = 0; 
                     } else {
                         // STANDARD / ROYALE
                         if (starving) foodVal = 50000.0 / safeDist;
@@ -332,15 +331,7 @@ public class Snake {
         return count;
     }
                 
-                if (isValid(nx, ny, W, H) && !visited[nx][ny] && !blocked[nx][ny]) {
-                    if (avoidHazards && hazards[nx][ny]) continue;
-                    visited[nx][ny] = true;
-                    q.add(new Point(nx, ny));
-                }
-            }
-        }
-        return count;
-    }
+
     
     // Simple BFS for distance
     static int bfsDist(int sx, int sy, int tx, int ty, int W, int H, boolean[][] blocked, boolean isWrapped) {
