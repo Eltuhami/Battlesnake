@@ -1,5 +1,5 @@
-# Use an official Maven image to build the application
-FROM maven:3.8-jdk-8 AS build
+# Use a Maven image with Eclipse Temurin JDK 8 to build the application
+FROM maven:3.9-eclipse-temurin-8 AS build
 WORKDIR /app
 
 # Copy the project files
@@ -9,8 +9,8 @@ COPY src ./src
 # Build the application
 RUN mvn clean package -DskipTests
 
-# Use a lightweight JRE image to run the application
-FROM openjdk:8-jre-slim
+# Use Eclipse Temurin JRE 8 image to run the application
+FROM eclipse-temurin:8-jre
 WORKDIR /app
 
 # Copy the built jar file from the build stage
