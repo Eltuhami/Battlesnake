@@ -171,7 +171,7 @@ public class Snake {
             double score = 0.0;
             
             // 2. Head Collision Prediction (Lookahead)
-            boolean riskyHead = false;
+            // Fix: Increase penalty for being near larger heads to verify cutoff
             for (Enemy e : enemies) {
                 int dist = Math.abs(nx - e.head.x) + Math.abs(ny - e.head.y); // Manhattan (ignoring walls for verify)
                 if (isWrapped) {
@@ -182,8 +182,7 @@ public class Snake {
                 
                 if (dist == 1) { // They could move to nx, ny
                     if (e.len >= myLen) {
-                        score -= 50000; // AVOID DEATH
-                        riskyHead = true;
+                        score -= 500000; // HUGE penalty involved to ensure we don't start a head-to-head
                     } else {
                         score += 20000; // KILL OPPORTUNITY
                     }
@@ -191,21 +190,23 @@ public class Snake {
             }
 
             // 3. Flood Fill (Space)
-            // Fix: Pass current 'blocked' which INCLUDES our head.
-            int space = floodFill(nx, ny, W, H, blocked, hazards, isWrapped, myHealth > 50);
+            // Fix: Pessimistic Flood Fill - assume larger enemies cut us off
+            int space = floodFill(nx, ny, W, H, blocked, hazards, isWrapped, myHealth > 50, enemies, myLen);
             
             if (space < myLen) {
-                score -= 100000; // Dead end
+                score -= 10000000; // DEAD END - Avoid at ALL costs
             } else if (space < myLen * 2) {
-                score -= 5000; // Tight spot
+                score -= 50000; // Tight spot - only if necessary
             } else {
-                score += space * 10; // More space is better
+                if (isConstrictor) score += space * 50; // In Constrictor, space is EVERYTHING
+                else score += space * 10; // More space is better
             }
 
             // 4. Hazards
             if (hazards[nx][ny]) {
-                score -= hazardDamage * 100;
-                if (myHealth < hazardDamage + 10) score -= 100000; // Don't die to hazard
+                score -= hazardDamage * 1000; // Heavy hazard penalty
+                int healthBuffer = isConstrictor ? 10 : hazardDamage + 10;
+                if (myHealth < healthBuffer) score -= 10000000; // Don't die to hazard
             }
 
             // 5. Food
@@ -225,7 +226,8 @@ public class Snake {
                     double foodVal = 0;
                     if (isConstrictor) {
                          // CONSTRICTOR MODE: Food is less important unless health is critical
-                         if (myHealth < 10) foodVal = 50000.0 / safeDist;
+                         // Increased threshold to 30 because games can be long
+                         if (myHealth < 30) foodVal = 50000.0 / safeDist;
                          else foodVal = 100.0 / safeDist; // Minimal interest
                     } else {
                         // STANDARD / ROYALE
@@ -281,7 +283,7 @@ public class Snake {
         return x >= 0 && x < W && y >= 0 && y < H;
     }
 
-    static int floodFill(int sx, int sy, int W, int H, boolean[][] blocked, boolean[][] hazards, boolean isWrapped, boolean avoidHazards) {
+    static int floodFill(int sx, int sy, int W, int H, boolean[][] blocked, boolean[][] hazards, boolean isWrapped, boolean avoidHazards, List<Enemy> enemies, int myLen) {
         boolean[][] visited = new boolean[W][H];
         Queue<Point> q = new LinkedList<>();
         q.add(new Point(sx, sy));
@@ -301,6 +303,34 @@ public class Snake {
                     nx = (nx + W) % W;
                     ny = (ny + H) % H;
                 }
+                
+                if (isValid(nx, ny, W, H) && !visited[nx][ny] && !blocked[nx][ny]) {
+                    if (avoidHazards && hazards[nx][ny]) continue;
+                    
+                    // PESSIMISTIC CHECK: Is this cell adjacent to a larger enemy head?
+                    boolean dangerous = false;
+                    for (Enemy e : enemies) {
+                        if (e.len >= myLen) {
+                            int distToHead = Math.abs(nx - e.head.x) + Math.abs(ny - e.head.y);
+                            if (isWrapped) {
+                                distToHead = Math.min(Math.abs(nx - e.head.x), W - Math.abs(nx - e.head.x)) +
+                                             Math.min(Math.abs(ny - e.head.y), H - Math.abs(ny - e.head.y));
+                            }
+                            if (distToHead <= 1) { // Checks adjacency (1 step away)
+                                dangerous = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (dangerous) continue; // Treat as blocked
+
+                    visited[nx][ny] = true;
+                    q.add(new Point(nx, ny));
+                }
+            }
+        }
+        return count;
+    }
                 
                 if (isValid(nx, ny, W, H) && !visited[nx][ny] && !blocked[nx][ny]) {
                     if (avoidHazards && hazards[nx][ny]) continue;
