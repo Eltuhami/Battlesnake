@@ -223,9 +223,16 @@ public class Snake {
                     double safeDist = Math.max(1.0, (double)dist);
 
                     double foodVal = 0;
-                    if (starving) foodVal = 50000.0 / safeDist;
-                    else if (hungry || smallest) foodVal = 2000.0 / safeDist;
-                    else foodVal = 500.0 / safeDist;
+                    if (isConstrictor) {
+                         // CONSTRICTOR MODE: Food is less important unless health is critical
+                         if (myHealth < 10) foodVal = 50000.0 / safeDist;
+                         else foodVal = 100.0 / safeDist; // Minimal interest
+                    } else {
+                        // STANDARD / ROYALE
+                        if (starving) foodVal = 50000.0 / safeDist;
+                        else if (hungry || smallest) foodVal = 2000.0 / safeDist;
+                        else foodVal = 500.0 / safeDist;
+                    }
                     
                     // Safety: Is this food close to a big enemy?
                     for (Enemy e : enemies) {
@@ -241,7 +248,8 @@ public class Snake {
             }
 
             // 6. Center Bias (for early game / standard)
-            if (!isRoyale && turn < 100) {
+            // Constrictor mode: Center is dangerous, stay away or use freely. No bias needed.
+            if (!isRoyale && !isConstrictor && turn < 100) {
                  int distCenter = Math.abs(nx - W/2) + Math.abs(ny - H/2);
                  score -= distCenter * 10;
             }
