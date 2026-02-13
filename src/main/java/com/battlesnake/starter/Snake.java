@@ -357,9 +357,30 @@ public class Snake {
                     // Simplified: Block everything.
                     if (i == body.size() - 1) { 
                         // It's the tail.
-                        // If it's me & I'm not eating (simplified check), maybe it's free?
-                        // Let's keep it blocked for safety to avoid 50/50s.
-                        blocked[p.x][p.y] = true;
+                        boolean isMe = id.equals(myId);
+                        boolean isEating = false;
+                        
+                        // Check if head is adjacent to food
+                        List<Point> headNeighbors = new ArrayList<>();
+                        for (int[] d : DIRS) {
+                            Point n = new Point(body.get(0).x + d[0], body.get(0).y + d[1]);
+                            if (isWrapped) n = wrap(n);
+                            headNeighbors.add(n);
+                        }
+                        
+                        for (Point f : foods) {
+                            if (headNeighbors.contains(f)) {
+                                isEating = true;
+                                break;
+                            }
+                        }
+                        
+                        // If it's me and I'm not eating, tail is free
+                        if (isMe && !isEating) {
+                             blocked[p.x][p.y] = false;
+                        } else {
+                             blocked[p.x][p.y] = true;
+                        }
                     } else {
                         blocked[p.x][p.y] = true;
                     }
