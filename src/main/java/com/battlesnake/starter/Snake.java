@@ -231,6 +231,26 @@ public class Snake {
             score -= distCenter * 10;
         }
 
+        // --- 5. DUEL MODE (1v1) ---
+        if (state.enemies.size() == 1) {
+             Enemy e = state.enemies.get(0);
+             int distToEnemy = state.dist(next, e.head);
+             
+             if (state.myLen > e.len) {
+                 // HUNTER MODE: We are bigger. Crowd them.
+                 // Pull towards them to restrict their space.
+                 score -= distToEnemy * 50; 
+             } else {
+                 // PREY MODE: We are smaller. Keep distance.
+                 score += distToEnemy * 50; 
+                 
+                 // vital: Stay off the walls to avoid getting trapped
+                 if (next.x == 0 || next.x == state.W - 1 || next.y == 0 || next.y == state.H - 1) {
+                     score -= 5000; 
+                 }
+             }
+        }
+
         return score;
     }
 
