@@ -273,7 +273,11 @@ public class Snake {
                 JsonNode settings = game.get("ruleset").get("settings");
                 if (settings != null && settings.has("hazardDamagePerTurn")) {
                     hazardDamage = settings.get("hazardDamagePerTurn").asInt();
+                } else {
+                    hazardDamage = 14; 
                 }
+            } else {
+                hazardDamage = 14;
             }
             isRoyale = rules.contains("royale");
             isConstrictor = rules.contains("constrictor");
