@@ -189,36 +189,71 @@ public class Snake {
         
         // 3. Space (Flood Fill)
         // Crucial for not getting trapped.
+        // NOTE: state.myHead is the START of flood fill.
         int space = floodFill(state, state.myHead);
         if (space < state.myBody.size()) {
             return -10_000_000.0 + (space * 100); // Almost dead, delay it
         }
         score += space * W_SPACE;
         
-        // 4. Food
-        // Find closest food
+        // 4. Food & Hazards (Old Heuristics)
         int minFoodDist = 1000;
+        Point bestFood = null;
         for (Point f : state.food) {
             int d = dist(state.myHead, f);
-            if (d < minFoodDist) minFoodDist = d;
+            if (d < minFoodDist) { minFoodDist = d; bestFood = f; }
         }
         
-        // Greed factor
-        double greed = W_FOOD;
-        if (state.myHealth < 40) greed *= 3;
+        // Hazard Penalty
+        if (state.isHazard(state.myHead)) {
+            score -= 1000 * state.hazardDamage; 
+        }
+
+        // Danger Penalty (Head to Head)
+        for (Enemy e : state.enemies) {
+             int d = dist(state.myHead, e.head);
+             if (d <= 1) { // Adjacent! check sizes
+                 if (e.body.size() >= state.myBody.size()) {
+                     score -= 50_000.0; // DANGER
+                 } else {
+                     score += 10_000.0; // KILL CHANCE
+                 }
+             }
+        }
         
-        // Subtract distance (closer is better)
-        score -= minFoodDist * greed;
+        // Food Score
+        double foodScore = 0;
+        if (bestFood != null) {
+            double greed = W_FOOD;
+            
+            // Hunger Logic
+            if (state.myHealth < 40) greed *= 4; // Starving
+            else if (state.myHealth < 70) greed *= 2; // Hungry
+            
+            foodScore = greed / (minFoodDist + 1);
+            
+            // Food Denial (Old Logic)
+            Enemy closestE = null;
+            int closestEDist = 1000;
+            for (Enemy e : state.enemies) {
+                int ed = dist(e.head, bestFood);
+                if (ed < closestEDist) { closestEDist = ed; closestE = e; }
+            }
+            if (closestE != null && closestE.body.size() < state.myBody.size() && minFoodDist <= closestEDist) {
+                 foodScore += 1000; // DENIAL BONUS
+            }
+        }
+        score += foodScore;
         
         // 5. Aggression / Duel
         if (state.enemies.size() == 1) {
             Enemy e = state.enemies.get(0);
             int distToEnemy = dist(state.myHead, e.head);
             if (state.myBody.size() > e.body.size()) {
-               // Crowd them
+               // Crowd them (Hunter Mode)
                score -= distToEnemy * W_AGGRESSION;
             } else {
-               // Run (but we handled walls via space flood fill)
+               // Run / Survival Mode (but handled by Space check mostly)
                score += distToEnemy * W_AGGRESSION;
             }
         }
