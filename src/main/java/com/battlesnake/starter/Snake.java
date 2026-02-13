@@ -306,6 +306,9 @@ public class Snake {
         
         // Board cache
         boolean[][] walls; // true if blocked
+        
+        int hazardDamage = 14; 
+        boolean isRoyale, isConstrictor, isWrapped;
 
         // Parse from JSON
         GameState(JsonNode root) {
@@ -313,17 +316,46 @@ public class Snake {
             width = board.get("width").asInt();
             height = board.get("height").asInt();
             turn = root.get("turn").asInt();
+
+            // Rules
+            JsonNode game = root.get("game");
+            String rules = "standard";
+            if (game != null && game.has("ruleset")) {
+                rules = game.get("ruleset").get("name").asText().toLowerCase();
+                JsonNode settings = game.get("ruleset").get("settings");
+                if (settings != null && settings.has("hazardDamagePerTurn")) {
+                    hazardDamage = settings.get("hazardDamagePerTurn").asInt();
+                }
+            }
+            isRoyale = rules.contains("royale");
+            isConstrictor = rules.contains("constrictor");
+            isWrapped = rules.contains("wrapped");
             
             food = new ArrayList<>();
             for (JsonNode f : board.get("food")) food.add(new Point(f.get("x").asInt(), f.get("y").asInt()));
             
             hazards = new ArrayList<>();
             if (board.has("hazards")) {
-                for (JsonNode h : board.get("hazards")) hazards.add(new Point(h.get("x").asInt(), h.get("y").asInt()));
+                for (JsonNode h : board.get("hazards")) {
+                    Point p = new Point(h.get("x").asInt(), h.get("y").asInt());
+                    hazards.add(p);
+                     // In Constrictor, treat hazard as blocked to avoid flood-filling into death
+                     // In Royale, we handle it dynamically in scoreMove
+                     if (isConstrictor && isValid(p)) {
+                         // blocked[p.x][p.y] = true; // Wait, blocked array is initialized later.
+                     }
+                }
             }
             
             enemies = new ArrayList<>();
             walls = new boolean[width][height];
+            
+            // Constrictor Hazard Blocking
+            if (isConstrictor) {
+                 for (Point h : hazards) {
+                     if (isValid(h)) walls[h.x][h.y] = true;
+                 }
+            }
             
             JsonNode you = root.get("you");
             myBody = parseBody(you.get("body"));
@@ -505,6 +537,17 @@ public class Snake {
             return false;
         }
         
+        boolean isHazard(Point p) {
+            Point check = isWrapped ? wrap(p) : p;
+            return isValid(check) && hazards.contains(check);
+        }
+        
+        Point wrap(Point p) {
+            int nx = (p.x % width + width) % width;
+            int ny = (p.y % height + height) % height;
+            return new Point(nx, ny);
+        }
+
         List<Point> neighbors(Point p) {
             List<Point> res = new ArrayList<>();
             int[][] dirs = {{0,1}, {0,-1}, {1,0}, {-1,0}};
