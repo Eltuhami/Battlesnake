@@ -26,8 +26,8 @@ public class Snake {
     private static final double SCORE_HAZARD = -100_000.0;           // Step into hazard
     private static final double SCORE_DANGER = -50_000.0;            // Head-to-head risk
     private static final double SCORE_FOOD_STARVING = 10_000.0;
-    private static final double SCORE_FOOD_HUNGRY = 2_000.0;
-    private static final double SCORE_FOOD_NORMAL = 500.0;
+    private static final double SCORE_FOOD_HUNGRY = 3_000.0;
+    private static final double SCORE_FOOD_NORMAL = 1_000.0;
 
     public static void main(String[] args) {
         String port = System.getProperty("PORT", "8082");
