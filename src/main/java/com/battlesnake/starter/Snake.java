@@ -128,34 +128,43 @@ public class Snake {
              }
         }
 
+        // Create a set of "Future Enemy Head Positions" to treat as blocked in flood fill
+        Set<Point> dangerousNodes = new HashSet<>();
+        for (Enemy e : state.enemies) {
+            if (e.id.equals(state.myId)) continue;
+            // If they can kill us or trade, assume they WILL cut us off.
+            // Even if they are smaller, they can be annoying, but strictly "dangerous" usually means bigger.
+            // To be safe against the "opponent" mentioned, let's treat ALL enemies as potential blockers for space.
+            if (e.len >= state.myLen) {
+                for (int[] d : DIRS) {
+                   Point p = e.head.add(d);
+                   if (state.isWrapped) p = state.wrap(p);
+                   dangerousNodes.add(p);
+                }
+            }
+        }
+
         // Flood Fill / Space
-        // calculate available space from 'next'
-        // We pass 'state.blocked' but need to assume we moved to 'next', so 'next' is now visited/blocked?
-        // Actually floodfill handles it.
-        int space = floodFill(state, next);
+        // Pass the dangerous nodes to be treated as "blocked" for space calculation
+        int space = floodFill(state, next, dangerousNodes);
         int requiredSpace = state.myLen;
         
         if (space < requiredSpace) {
             // TRAP!
-            // But is it better than a wall? YES.
-            // Score = IMPOSSIBLE + (space * 100) -> Still improved over wall.
-            // Actually, let's use CERTAIN_DEATH level.
-            // The more space, the longer we survive.
             score += SCORE_CERTAIN_DEATH + (space * 1000); 
         } else {
             // Plenty of space.
             if (state.isConstrictor) {
-                score += space * 50; // Maximize area
+                score += space * 50; 
             } else {
-                score += space * 5; // Preference for open areas
+                score += space * 5; 
             }
         }
 
         // --- 3. FOOD & OBJECTIVES ---
         
-        if (!state.isConstrictor) { // No food seeking in constrictor usually
+        if (!state.isConstrictor) { 
             double foodScore = 0;
-            // Scan all food
             for (Point f : state.foods) {
                 int dist = state.bfsDist(next, f);
                 if (dist == -1) continue;
@@ -165,17 +174,13 @@ public class Snake {
                 else if (state.myHealth < 50 || state.isSmallest) val = SCORE_FOOD_HUNGRY;
                 else val = SCORE_FOOD_NORMAL;
                 
-                // Discount by distance
-                double rawScore = val / (dist + 1); // +1 to avoid div0
-                
-                // Keep the best food score
+                double rawScore = val / (dist + 1); 
                 if (rawScore > foodScore) foodScore = rawScore;
             }
             score += foodScore;
         }
 
         // --- 4. STRATEGIC BIAS ---
-        // Center control (Standard mode)
         if (!state.isRoyale && !state.isConstrictor && state.turn < 100) {
             int cx = state.W / 2;
             int cy = state.H / 2;
@@ -188,13 +193,19 @@ public class Snake {
 
     // --- HELPERS ---
 
-    static int floodFill(GameState state, Point start) {
+    static int floodFill(GameState state, Point start, Set<Point> avoid) {
         // Simple BFS to count accessible nodes from start
-        // Limit depth to avoid timeout
         boolean[][] visited = new boolean[state.W][state.H];
         // Mark all known blocks
         for(int x=0; x<state.W; x++) {
             System.arraycopy(state.blocked[x], 0, visited[x], 0, state.H);
+        }
+        
+        // Mark "Avoid" spots (Potential Enemy Moves) as visited/blocked
+        for (Point p : avoid) {
+            if (state.isValid(p)) {
+                 visited[p.x][p.y] = true;
+            }
         }
         
         Queue<Point> q = new LinkedList<>();
@@ -204,13 +215,11 @@ public class Snake {
         }
         
         int count = 0;
-        int MAX_COUNT = state.W * state.H; 
         
         while(!q.isEmpty()) {
             Point p = q.poll();
             count++;
             
-            // Optimization: if we have enough space for our whole body, we're likely safe
             if (count >= state.myLen * 2) return count;
 
             for (int[] d : DIRS) {
@@ -218,9 +227,6 @@ public class Snake {
                 if (state.isWrapped) n = state.wrap(n);
                 
                 if (state.isValid(n) && !visited[n.x][n.y]) {
-                    // Check hazards if strictly ensuring safety? 
-                    // For now, allow hazards in flood fill but maybe penalize? 
-                    // Standard FF just checks walls.
                     visited[n.x][n.y] = true;
                     q.add(n);
                 }
