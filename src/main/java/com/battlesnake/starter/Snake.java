@@ -228,7 +228,8 @@ public class Snake {
 
     // --- FLOOD FILL ---
     static int floodFill(GameState state, Point start) {
-        if (!state.isValid(start) || state.isBlocked(start)) return 0;
+        if (!state.isValid(start)) return 0;
+        // Don't check isBlocked for start, since it's the snake's head
         
         boolean[][] visited = new boolean[state.width][state.height];
         Queue<Point> q = new LinkedList<>();
