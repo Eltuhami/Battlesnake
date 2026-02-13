@@ -145,10 +145,29 @@ public class Snake {
         }
 
         // Flood Fill / Space
-        // Pass the dangerous nodes to be treated as "blocked" for space calculation
-        int space = floodFill(state, next, dangerousNodes);
-        int requiredSpace = state.myLen;
+        // Tiered Flood Fill for Royale:
+        // 1. Calculate space assuming hazards are walls (Safe Space)
+        Set<Point> safeAvoid = new HashSet<>(dangerousNodes);
+        safeAvoid.addAll(state.hazardPoints);
+        int safeSpace = floodFill(state, next, safeAvoid);
         
+        // 2. Calculate space allowing hazards (Total Space) (Fallback)
+        int totalSpace = floodFill(state, next, dangerousNodes);
+        
+        int space = safeSpace;
+        int requiredSpace = state.myLen;
+
+        // If safe space is insufficient, but total space is enough, rely on total space
+        // This means we are willing to enter/traverse hazards to survive.
+        if (safeSpace < requiredSpace && totalSpace >= requiredSpace) {
+            space = totalSpace;
+            // Apply a penalty for relying on hazards, so we prefer fully safe paths if available
+            score -= 1000; 
+        } else if (safeSpace < requiredSpace && totalSpace < requiredSpace) {
+             // Trapped even with hazards
+             space = totalSpace;
+        }
+
         if (space < requiredSpace) {
             // TRAP!
             score += SCORE_CERTAIN_DEATH + (space * 1000); 
@@ -250,6 +269,7 @@ public class Snake {
         
         List<Point> foods = new ArrayList<>();
         List<Enemy> enemies = new ArrayList<>();
+        Set<Point> hazardPoints = new HashSet<>();
         boolean isSmallest = false;
 
         GameState(JsonNode root) {
@@ -293,8 +313,10 @@ public class Snake {
                     Point p = new Point(h.get("x").asInt(), h.get("y").asInt());
                     if (isValid(p)) {
                         hazards[p.x][p.y] = true;
-                        // In Constrictor or deep Royale, treat hazard as blocked to avoid flood-filling into death
-                        if (isConstrictor || (isRoyale && hazardDamage >= 50)) {
+                        hazardPoints.add(p);
+                        // In Constrictor, treat hazard as blocked to avoid flood-filling into death
+                        // In Royale, we handle it dynamically in scoreMove
+                        if (isConstrictor) {
                             blocked[p.x][p.y] = true;
                         }
                     }
