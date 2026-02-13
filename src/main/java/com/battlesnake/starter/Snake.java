@@ -193,6 +193,30 @@ public class Snake {
                 else if (state.myHealth < 50 || state.isSmallest) val = SCORE_FOOD_HUNGRY;
                 else val = SCORE_FOOD_NORMAL;
                 
+                // Food Denial Logic:
+                // Is a smaller, hungry enemy closer to this food?
+                // If we can beat them to it, it's worth more.
+                Enemy closestE = null;
+                int closestEDist = 1000;
+                
+                for (Enemy e : state.enemies) {
+                    if (e.id.equals(state.myId)) continue;
+                    int ed = state.dist(e.head, f); // Using manhattan for speed approximation
+                    if (ed < closestEDist) {
+                        closestEDist = ed;
+                        closestE = e;
+                    }
+                }
+                
+                // Only chase if we are closer or equal distance to the food than the enemy
+                if (closestE != null && closestE.len < state.myLen && dist <= closestEDist) {
+                     // They are close to it. Are they hungry?
+                     // We don't have their health in the Enemy object, need to look up or parse.
+                     // Simplified: If they are close, they might want it. 
+                     // Denial Value: 
+                     val += 1000; // Bonus for denial
+                }
+
                 double rawScore = val / (dist + 1); 
                 if (rawScore > foodScore) foodScore = rawScore;
             }
