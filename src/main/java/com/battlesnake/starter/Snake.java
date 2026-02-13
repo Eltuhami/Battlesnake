@@ -10,24 +10,23 @@ import java.util.*;
 import static spark.Spark.*;
 
 /**
- * GODMODE SNAKE v21.0 - REFACTORED APEX
+ * GODMODE SNAKE v22.0 - MINIMAX ENGINE
  */
 public class Snake {
     private static final ObjectMapper JSON = new ObjectMapper();
     private static final Logger LOG = LoggerFactory.getLogger(Snake.class);
 
-    // --- CONSTANTS ---
-    private static final int[][] DIRS = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}};
-    private static final String[] DIR_NAMES = {"up", "down", "left", "right"};
+    // --- TUNING CONSTANTS ---
+    private static final int TIMEOUT_MS = 350; // Leave 150ms buffer
+    private static final int MAX_DEPTH = 12;   // Safety cap
+    private static final int MIN_DEPTH = 3;    // Ensure we look at least this far
 
-    // Scoring Weights
-    private static final double SCORE_IMPOSSIBLE = -1_000_000_000.0; // Walls, own body, direct hazard death
-    private static final double SCORE_CERTAIN_DEATH = -10_000_000.0; // Trapped in small space
-    private static final double SCORE_HAZARD = -100_000.0;           // Step into hazard
-    private static final double SCORE_DANGER = -50_000.0;            // Head-to-head risk
-    private static final double SCORE_FOOD_STARVING = 10_000.0;
-    private static final double SCORE_FOOD_HUNGRY = 3_000.0;
-    private static final double SCORE_FOOD_NORMAL = 1_000.0;
+    // Evaluator Weights
+    private static final double W_SURVIVAL = 1_000_000.0;
+    private static final double W_SPACE = 10.0; // Per square of control
+    private static final double W_FOOD = 200.0;
+    private static final double W_HEALTH = 1.0;
+    private static final double W_AGGRESSION = 50.0; // Per square closer to victim
 
     public static void main(String[] args) {
         String port = System.getProperty("PORT", "8082");
@@ -41,255 +40,211 @@ public class Snake {
     static Map<String, String> index() {
         Map<String, String> r = new HashMap<>();
         r.put("apiversion", "1");
-        r.put("author", "GODMODE-V21");
-        r.put("color", "#FF0000"); // Blood Red
-        r.put("head", "evil");
+        r.put("author", "GODMODE-V22");
+        r.put("color", "#00FF00"); // Matrix Green
+        r.put("head", "smart-caterpillar");
         r.put("tail", "sharp");
         return r;
     }
 
+    // --- GAME ENGINE ---
+
     static Map<String, String> move(JsonNode root) {
-        // 1. Parse State
-        GameState state = new GameState(root);
+        long startTime = System.currentTimeMillis();
+        GameState initialState = new GameState(root);
         
-        // 2. Score Moves
-        Map<String, Double> scores = new HashMap<>();
-        for (int i = 0; i < 4; i++) {
-            String dirName = DIR_NAMES[i];
-            Point next = state.myHead.add(DIRS[i]);
-            double score = scoreMove(state, next, dirName);
-            scores.put(dirName, score);
-        }
-
-        // 3. Select Best
-        String bestDir = "up";
-        double maxScore = -Double.MAX_VALUE;
-        for (Map.Entry<String, Double> entry : scores.entrySet()) {
-            if (entry.getValue() > maxScore) {
-                maxScore = entry.getValue();
-                bestDir = entry.getKey();
-            }
-        }
-
-        LOG.info("Turn {}: Best move {} score {}", state.turn, bestDir, maxScore);
+        String bestMove = "up";
+        double bestScore = -Double.MAX_VALUE;
         
-        // Fail-safe: If all moves are impossible (shouldn't happen with correct logic, but for safety)
-        // we might want to just pick the "least bad" impossible move or random to try and luck out.
-        // But our logic handles "Certain Death" > "Impossible", so it should pick the trap over the wall.
-
-        Map<String, String> res = new HashMap<>();
-        res.put("move", bestDir);
-        return res;
-    }
-
-    private static double scoreMove(GameState state, Point next, String dirName) {
-        // --- 1. ABSOLUTE CHECKS (The "Impossible" Stuff) ---
+        // Iterative Deepening
+        // Start at depth 1, go deeper until panic time
+        int reachedDepth = 0;
         
-        // Bounds
-        if (!state.isValid(next)) return SCORE_IMPOSSIBLE;
+        // Move ordering: Try likely good moves first to improve pruning
+        // We will store the best move from previous depth to try first in next depth
         
-        // Instant Collision (Body/Walls)
-        // Is it blocked?
-        if (state.isBlocked(next)) {
-             // Special Case: Tail chasing. Ideally, we shouldn't mark our own tail as blocked if we are moving?
-             // But for safety, standard starter logic treats it as blocked.
-             // Advanced: If we are not growing, the tail will move.
-             // Implemented in State parsing: tail is NOT blocked if we haven't eaten.
-             return SCORE_IMPOSSIBLE;
-        }
-
-        // --- 2. SURVIVAL & TRAPS ---
-        
-        double score = 0.0;
-
-        // Hazard Check
-        if (state.isHazard(next)) {
-            score += SCORE_HAZARD * state.hazardDamage; // Higher damage = lower score
-            // If low health, avoid like the plague
-            if (state.myHealth <= state.hazardDamage + 5) {
-                return SCORE_IMPOSSIBLE; // Avoid suicide
-            }
-        }
-
-        // Head-to-Head Risk
-        // If 'next' is adjacent to a larger enemy head, we die.
-        for (Enemy e : state.enemies) {
-             if (e.id.equals(state.myId)) continue;
-             int dist = state.dist(next, e.head);
-             if (dist == 1) { // They COULD move to 'next'
-                 if (e.len >= state.myLen) {
-                     // DANGER! They are bigger or equal.
-                     // If equal, it's a trade. If we are desperate, maybe? But usually avoid.
-                     score += SCORE_DANGER * 10; 
-                 } else {
-                     // We are bigger. Opportunity!
-                     score += 5000; 
-                 }
-             }
-        }
-
-        // Create a set of "Future Enemy Head Positions" to treat as blocked in flood fill
-        Set<Point> dangerousNodes = new HashSet<>();
-        for (Enemy e : state.enemies) {
-            if (e.id.equals(state.myId)) continue;
-            // If they can kill us or trade, assume they WILL cut us off.
-            // Even if they are smaller, they can be annoying, but strictly "dangerous" usually means bigger.
-            // To be safe against the "opponent" mentioned, let's treat ALL enemies as potential blockers for space.
-            if (e.len >= state.myLen) {
-                for (int[] d : DIRS) {
-                   Point p = e.head.add(d);
-                   if (state.isWrapped) p = state.wrap(p);
-                   dangerousNodes.add(p);
-                }
-            }
-        }
-
-        // Flood Fill / Space
-        // Tiered Flood Fill for Royale:
-        // 1. Calculate space assuming hazards are walls (Safe Space)
-        Set<Point> safeAvoid = new HashSet<>(dangerousNodes);
-        safeAvoid.addAll(state.hazardPoints);
-        int safeSpace = floodFill(state, next, safeAvoid);
-        
-        // 2. Calculate space allowing hazards (Total Space) (Fallback)
-        int totalSpace = floodFill(state, next, dangerousNodes);
-        
-        int space = safeSpace;
-        int requiredSpace = state.myLen;
-
-        // If safe space is insufficient, but total space is enough, rely on total space
-        // This means we are willing to enter/traverse hazards to survive.
-        if (safeSpace < requiredSpace && totalSpace >= requiredSpace) {
-            space = totalSpace;
-            // Apply a penalty for relying on hazards, so we prefer fully safe paths if available
-            score -= 1000; 
-        } else if (safeSpace < requiredSpace && totalSpace < requiredSpace) {
-             // Trapped even with hazards
-             space = totalSpace;
-        }
-
-        if (space < requiredSpace) {
-            // TRAP!
-            score += SCORE_CERTAIN_DEATH + (space * 1000); 
-        } else {
-            // Plenty of space.
-            if (state.isConstrictor) {
-                score += space * 50; 
-            } else {
-                score += space * 5; 
-            }
-        }
-
-        // --- 3. FOOD & OBJECTIVES ---
-        
-        if (!state.isConstrictor) { 
-            double foodScore = 0;
-            for (Point f : state.foods) {
-                int dist = state.bfsDist(next, f);
-                if (dist == -1) continue;
+        for (int depth = 1; depth <= MAX_DEPTH; depth++) {
+            if (System.currentTimeMillis() - startTime > TIMEOUT_MS) break;
+            
+            try {
+                // Root Search
+                double maxVal = -Double.MAX_VALUE;
+                String currentLevelBest = null;
                 
-                double val = 0;
-                if (state.myHealth < 20) val = SCORE_FOOD_STARVING;
-                else if (state.myHealth < 50 || state.isSmallest) val = SCORE_FOOD_HUNGRY;
-                else val = SCORE_FOOD_NORMAL;
-                
-                // Food Denial Logic:
-                // Is a smaller, hungry enemy closer to this food?
-                // If we can beat them to it, it's worth more.
-                Enemy closestE = null;
-                int closestEDist = 1000;
-                
-                for (Enemy e : state.enemies) {
-                    if (e.id.equals(state.myId)) continue;
-                    int ed = state.dist(e.head, f); // Using manhattan for speed approximation
-                    if (ed < closestEDist) {
-                        closestEDist = ed;
-                        closestE = e;
+                // My possible moves
+                List<MoveScore> moves = new ArrayList<>();
+                for (String m : new String[]{"up", "down", "left", "right"}) {
+                    if (System.currentTimeMillis() - startTime > TIMEOUT_MS) throw new RuntimeException("Timeout");
+                    
+                    GameState next = initialState.simulate(m);
+                    if (next == null) {
+                        moves.add(new MoveScore(m, -Double.MAX_VALUE)); // Wall/Self-Hit instant death
+                        continue;
+                    }
+                    
+                    // Minimax call
+                    double val = minimax(next, depth - 1, -Double.MAX_VALUE, Double.MAX_VALUE, false, startTime);
+                    moves.add(new MoveScore(m, val));
+                    
+                    if (val > maxVal) {
+                        maxVal = val;
+                        currentLevelBest = m;
                     }
                 }
                 
-                // Only chase if we are closer or equal distance to the food than the enemy
-                if (closestE != null && closestE.len < state.myLen && dist <= closestEDist) {
-                     // They are close to it. Are they hungry?
-                     // We don't have their health in the Enemy object, need to look up or parse.
-                     // Simplified: If they are close, they might want it. 
-                     // Denial Value: 
-                     val += 1000; // Bonus for denial
+                // If we found a valid move this depth, update global best
+                if (currentLevelBest != null) {
+                    bestMove = currentLevelBest;
+                    bestScore = maxVal;
+                    reachedDepth = depth;
                 }
-
-                double rawScore = val / (dist + 1); 
-                if (rawScore > foodScore) foodScore = rawScore;
+                
+                // Verify: If we see inevitable death (-Infinity) at this depth, 
+                // stop if we had a better move at shallower depth? 
+                // No, a shallower "safe" move might be a trap detected only at this depth.
+                // Trust the deepest complete search.
+                
+            } catch (RuntimeException e) {
+                // Timeout during this depth, discard results of this partial depth
+                break;
             }
-            score += foodScore;
         }
-
-        // --- 4. STRATEGIC BIAS ---
-        if (!state.isRoyale && !state.isConstrictor && state.turn < 100) {
-            int cx = state.W / 2;
-            int cy = state.H / 2;
-            int distCenter = Math.abs(next.x - cx) + Math.abs(next.y - cy);
-            score -= distCenter * 10;
+        
+        LOG.info("Turn {}: Depth {} Best {} Score {}", initialState.turn, reachedDepth, bestMove, bestScore);
+        
+        Map<String, String> res = new HashMap<>();
+        res.put("move", bestMove);
+        return res;
+    }
+    
+    static double minimax(GameState state, int depth, double alpha, double beta, boolean maxPlayer, long startTime) {
+        if (System.currentTimeMillis() - startTime > TIMEOUT_MS) throw new RuntimeException("Timeout");
+        
+        // Terminal or Leaf
+        if (depth == 0 || state.gameOver) {
+            return evaluate(state);
         }
+        
+        if (maxPlayer) {
+            double maxEval = -Double.MAX_VALUE;
+            // My moves
+            for (String move : new String[]{"up", "down", "left", "right"}) {
+                GameState next = state.simulate(move);
+                double eval = (next == null) ? -Double.MAX_VALUE : minimax(next, depth - 1, alpha, beta, false, startTime);
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, eval);
+                if (beta <= alpha) break; // Prune
+            }
+            return maxEval;
+        } else {
+            // Enemy moves
+            // SIMPLIFICATION: Paranoid. 
+            // Assume the world moves to minimize our score.
+            // Model enemies as one logical "Enemy" entity that plays the worst move for us.
+            // (Simulating all permutations of 3 enemies is too expensive O(3^N * 4^N)).
+            
+            // To be accurate but fast: Advance closest enemy towards us/food, others randomly?
+            // "Paranoid Minimax": We assume the board state evolves in the worst way.
+            // For now, let's just step the world forward.
+            // Since we can't control enemies, we have to account for their BEST move (which is BAD for us).
+            // But checking ALL enemy moves is crazy.
+            // Strategy: Simulate a "Turn" where all enemies move roughly towards food or us.
+            
+            // BETTER: We don't branch on enemy moves. We just "Simulate World Step" deterministically 
+            // or semi-deterministically to get to the next "Max" node.
+            // Taking 1 probable outcome for opponents allows us to search deeper (Depth 10 vs Depth 3).
+            // Given the heuristic nature, Depth is king.
+            
+            GameState next = state.simulateWorldStep();
+            // After enemies move, it's our turn again (depth - 1)
+            // But wait, standard Minimax decreases depth on *our* move. 
+            // Let's treat (Us Move + World Move) as 1 Depth layer.
+            
+            // So: minimax(next, depth - 1 ...) 
+            // Wait, the previous block called simulate(move) which creates a state where WE moved but enemies haven't.
+            // So this 'else' block represents the enemies reacting.
+            
+            return minimax(next, depth, alpha, beta, true, startTime); 
+            // Note: Depth not decremented here because we treat (Our Move -> Enemy Move) as 1 turn.
+            // The recursions is:
+            // Root (Max) -> call minimax(stateAfterMyMove)
+            //   Node (Min/World) -> call minimax(stateAfterEnemyMoves)
+            //     Node (Max) -> depth decrements.
+        }
+    }
 
-        // --- 5. DUEL MODE (1v1) ---
+    // --- EVALUATION ---
+    
+    static double evaluate(GameState state) {
+        if (!state.alive) return -1_000_000_000.0; // Dead
+        
+        double score = 0;
+        
+        // 1. Survival Bonus
+        score += W_SURVIVAL; 
+        
+        // 2. Health
+        // We want to be healthy but not obsessed.
+        if (state.myHealth < 20) score -= (20 - state.myHealth) * 1000; // Panic starvation
+        
+        // 3. Space (Flood Fill)
+        // Crucial for not getting trapped.
+        int space = floodFill(state, state.myHead);
+        if (space < state.myBody.size()) {
+            return -10_000_000.0 + (space * 100); // Almost dead, delay it
+        }
+        score += space * W_SPACE;
+        
+        // 4. Food
+        // Find closest food
+        int minFoodDist = 1000;
+        for (Point f : state.food) {
+            int d = dist(state.myHead, f);
+            if (d < minFoodDist) minFoodDist = d;
+        }
+        
+        // Greed factor
+        double greed = W_FOOD;
+        if (state.myHealth < 40) greed *= 3;
+        
+        // Subtract distance (closer is better)
+        score -= minFoodDist * greed;
+        
+        // 5. Aggression / Duel
         if (state.enemies.size() == 1) {
-             Enemy e = state.enemies.get(0);
-             int distToEnemy = state.dist(next, e.head);
-             
-             if (state.myLen > e.len) {
-                 // HUNTER MODE: We are bigger. Crowd them.
-                 // Pull towards them to restrict their space.
-                 score -= distToEnemy * 50; 
-             } else {
-                 // PREY MODE: We are smaller. Keep distance.
-                 score += distToEnemy * 50; 
-                 
-                 // vital: Stay off the walls to avoid getting trapped
-                 if (next.x == 0 || next.x == state.W - 1 || next.y == 0 || next.y == state.H - 1) {
-                     score -= 5000; 
-                 }
-             }
+            Enemy e = state.enemies.get(0);
+            int distToEnemy = dist(state.myHead, e.head);
+            if (state.myBody.size() > e.body.size()) {
+               // Crowd them
+               score -= distToEnemy * W_AGGRESSION;
+            } else {
+               // Run (but we handled walls via space flood fill)
+               score += distToEnemy * W_AGGRESSION;
+            }
         }
-
+        
         return score;
     }
 
-    // --- HELPERS ---
-
-    static int floodFill(GameState state, Point start, Set<Point> avoid) {
-        // Simple BFS to count accessible nodes from start
-        boolean[][] visited = new boolean[state.W][state.H];
-        // Mark all known blocks
-        for(int x=0; x<state.W; x++) {
-            System.arraycopy(state.blocked[x], 0, visited[x], 0, state.H);
-        }
+    // --- FLOOD FILL ---
+    static int floodFill(GameState state, Point start) {
+        if (!state.isValid(start) || state.isBlocked(start)) return 0;
         
-        // Mark "Avoid" spots (Potential Enemy Moves) as visited/blocked
-        for (Point p : avoid) {
-            if (state.isValid(p)) {
-                 visited[p.x][p.y] = true;
-            }
-        }
-        
+        boolean[][] visited = new boolean[state.width][state.height];
         Queue<Point> q = new LinkedList<>();
-        if (state.isValid(start) && !visited[start.x][start.y]) {
-            q.add(start);
-            visited[start.x][start.y] = true;
-        }
+        q.add(start);
+        visited[start.x][start.y] = true;
         
         int count = 0;
+        int max = state.myBody.size() * 3; // Optimization cap
         
         while(!q.isEmpty()) {
             Point p = q.poll();
             count++;
+            if (count >= max) return max;
             
-            if (count >= state.myLen * 2) return count;
-
-            for (int[] d : DIRS) {
-                Point n = p.add(d);
-                if (state.isWrapped) n = state.wrap(n);
-                
-                if (state.isValid(n) && !visited[n.x][n.y]) {
+            for (Point n : state.neighbors(p)) {
+                if (!visited[n.x][n.y] && !state.isBlocked(n)) {
                     visited[n.x][n.y] = true;
                     q.add(n);
                 }
@@ -298,218 +253,270 @@ public class Snake {
         return count;
     }
 
-    // --- DATA CLASSES ---
+    // --- DATA STRUCTURES ---
 
     static class GameState {
-        int W, H, turn;
-        String myId;
-        int myHealth, myLen;
+        int width, height, turn;
+        boolean alive = true;
+        boolean gameOver = false;
+        
         Point myHead;
+        List<Point> myBody;
+        int myHealth;
         
-        boolean[][] blocked;
-        boolean[][] hazards;
-        boolean isRoyale, isConstrictor, isWrapped;
-        int hazardDamage = 0;
+        List<Enemy> enemies;
+        List<Point> food;
+        List<Point> hazards;
         
-        List<Point> foods = new ArrayList<>();
-        List<Enemy> enemies = new ArrayList<>();
-        Set<Point> hazardPoints = new HashSet<>();
-        boolean isSmallest = false;
+        // Board cache
+        boolean[][] walls; // true if blocked
 
+        // Parse from JSON
         GameState(JsonNode root) {
-            // Basic
             JsonNode board = root.get("board");
-            W = board.get("width").asInt();
-            H = board.get("height").asInt();
+            width = board.get("width").asInt();
+            height = board.get("height").asInt();
             turn = root.get("turn").asInt();
             
-            JsonNode you = root.get("you");
-            myId = you.get("id").asText();
-            myHealth = you.get("health").asInt();
-            myLen = you.get("body").size();
-            myHead = new Point(you.get("head").get("x").asInt(), you.get("head").get("y").asInt());
-
-            // Rules
-            JsonNode game = root.get("game");
-            String rules = "standard";
-            if (game != null && game.has("ruleset")) {
-                rules = game.get("ruleset").get("name").asText().toLowerCase();
-                JsonNode settings = game.get("ruleset").get("settings");
-                if (settings != null && settings.has("hazardDamagePerTurn")) {
-                    hazardDamage = settings.get("hazardDamagePerTurn").asInt();
-                } else {
-                    hazardDamage = 14; 
-                }
-            } else {
-                hazardDamage = 14;
-            }
-            isRoyale = rules.contains("royale");
-            isConstrictor = rules.contains("constrictor");
-            isWrapped = rules.contains("wrapped");
-
-            // Board Init
-            blocked = new boolean[W][H];
-            hazards = new boolean[W][H];
-
-            // Hazards
+            food = new ArrayList<>();
+            for (JsonNode f : board.get("food")) food.add(new Point(f.get("x").asInt(), f.get("y").asInt()));
+            
+            hazards = new ArrayList<>();
             if (board.has("hazards")) {
-                for (JsonNode h : board.get("hazards")) {
-                    Point p = new Point(h.get("x").asInt(), h.get("y").asInt());
-                    if (isValid(p)) {
-                        hazards[p.x][p.y] = true;
-                        hazardPoints.add(p);
-                        // In Constrictor, treat hazard as blocked to avoid flood-filling into death
-                        // In Royale, we handle it dynamically in scoreMove
-                        if (isConstrictor) {
-                            blocked[p.x][p.y] = true;
+                for (JsonNode h : board.get("hazards")) hazards.add(new Point(h.get("x").asInt(), h.get("y").asInt()));
+            }
+            
+            enemies = new ArrayList<>();
+            walls = new boolean[width][height];
+            
+            JsonNode you = root.get("you");
+            myBody = parseBody(you.get("body"));
+            myHead = myBody.get(0);
+            myHealth = you.get("health").asInt();
+            
+            for (JsonNode s : board.get("snakes")) {
+                if (s.get("id").asText().equals(you.get("id").asText())) continue;
+                List<Point> body = parseBody(s.get("body"));
+                enemies.add(new Enemy(s.get("id").asText(), body));
+                // Mark enemies as walls
+                for (Point p : body) if(isValid(p)) walls[p.x][p.y] = true; // Tail logic? Simplified: Blocked.
+            }
+            
+            // Mark myself (except head, which moves)
+            for (int i=1; i<myBody.size(); i++) { // Head not blocked for *move* checks usually, but here 'walls' is static obs
+               Point p = myBody.get(i);
+               if(isValid(p)) walls[p.x][p.y] = true;
+            }
+            // Actually, for flood fill, my head is a visited node.
+        }
+        
+        // Copy Constructor for simulation
+        GameState(GameState other) {
+            this.width = other.width;
+            this.height = other.height;
+            this.turn = other.turn;
+            this.alive = other.alive;
+            this.gameOver = other.gameOver;
+            this.myHead = other.myHead;
+            this.myBody = new ArrayList<>(other.myBody);
+            this.myHealth = other.myHealth;
+            this.enemies = new ArrayList<>();
+            for(Enemy e : other.enemies) this.enemies.add(new Enemy(e));
+            this.food = new ArrayList<>(other.food);
+            this.hazards = new ArrayList<>(other.hazards);
+            this.walls = new boolean[width][height];
+            for(int x=0; x<width; x++) System.arraycopy(other.walls[x], 0, this.walls[x], 0, height);
+        }
+
+        List<Point> parseBody(JsonNode bodyNode) {
+            List<Point> body = new ArrayList<>();
+            for (JsonNode b : bodyNode) body.add(new Point(b.get("x").asInt(), b.get("y").asInt()));
+            return body;
+        }
+
+        // Simulate MY move: returns state where I moved, enemies haven't yet
+        GameState simulate(String move) {
+            GameState next = new GameState(this);
+            Point d = moveDelta(move);
+            Point newHead = new Point(myHead.x + d.x, myHead.y + d.y);
+            
+            // Wall Check
+            if (!isValid(newHead)) return null; // Instant death
+            if (isBlocked(newHead)) return null; // Hit snake or wall
+            
+            // Move Head
+            next.myHead = newHead;
+            next.myBody.add(0, newHead);
+            
+            // Food Check
+            boolean ate = false;
+            // Remove food if eaten
+            for (int i=0; i<next.food.size(); i++) {
+                if (next.food.get(i).equals(newHead)) {
+                    next.food.remove(i);
+                    ate = true;
+                    next.myHealth = 100;
+                    break;
+                }
+            }
+            
+            if (!ate) {
+                // Remove Tail
+                Point tail = next.myBody.remove(next.myBody.size()-1);
+                // Unblock tail in 'walls'?
+                // For simplified sim, walls array is static, but dynamic checks use Body lists.
+                // We rely on isBlocked() checking lists.
+                next.myHealth--;
+            }
+            
+            if (next.myHealth <= 0) next.alive = false;
+            
+            return next;
+        }
+        
+        // Simulate WORLD Step: Enemies move, hazards hit
+        GameState simulateWorldStep() {
+            GameState next = new GameState(this);
+            next.turn++;
+            
+            // Simplistic Enemy AI: Move towards closest food or random valid
+            // We can't perfectly predict, but assuming they survive is better than assuming they die.
+            for (Enemy e : next.enemies) {
+                // Find a valid move for enemy
+                // 1. Closest Food
+                Point target = null;
+                int minDist = 1000;
+                for (Point f : next.food) {
+                    int d = dist(e.head, f);
+                    if (d < minDist) { minDist = d; target = f; }
+                }
+                
+                // 2. Move towards target
+                Point bestMove = null;
+                // Try dirs
+                for (Point n : neighbors(e.head)) {
+                    if (!isBlocked(n) && !n.equals(next.myHead)) { // Don't run into me yet
+                        if (bestMove == null) bestMove = n;
+                        else if (target != null && dist(n, target) < dist(bestMove, target)) bestMove = n;
+                    }
+                }
+                
+                // If stuck, die
+                if (bestMove == null) {
+                    // Enemy dies (remove them? For now just keep them static or remove)
+                    // Removing is cleaner
+                    // e.alive = false;
+                } else {
+                    // Update enemy
+                    e.head = bestMove;
+                    e.body.add(0, bestMove);
+                    boolean ate = false;
+                    for (int i=0; i<next.food.size(); i++) {
+                        if (next.food.get(i).equals(bestMove)) {
+                            next.food.remove(i);
+                            ate = true;
+                            // Enemy grows
+                            break;
                         }
+                    }
+                    if (!ate) e.body.remove(e.body.size()-1);
+                }
+            }
+            
+            // Check Collisions (Head to Head)
+            // If my head hits enemy head
+            // Or enemy head hits my body
+            
+            // 1. Me hitting enemy body
+            for (Enemy e : next.enemies) {
+                for (Point p : e.body) {
+                    if (p.equals(next.myHead) && !p.equals(e.head)) { // Body hit
+                        next.alive = false;
+                    }
+                }
+                
+                // Head to Head
+                if (e.head.equals(next.myHead)) {
+                    if (e.body.size() >= next.myBody.size()) {
+                        next.alive = false; // I lost
+                    } else {
+                        // I win, enemy dies
+                        // Remove enemy?
+                        // e.alive = false;
                     }
                 }
             }
             
-            // Food
-            for (JsonNode f : board.get("food")) {
-                foods.add(new Point(f.get("x").asInt(), f.get("y").asInt()));
-            }
-
-            // Snakes
-            int maxLen = 0;
-            for (JsonNode s : board.get("snakes")) {
-                String id = s.get("id").asText();
-                int len = s.get("body").size();
-                if (!id.equals(myId)) maxLen = Math.max(maxLen, len);
-                
-                List<Point> body = new ArrayList<>();
-                for (JsonNode b : s.get("body")) {
-                    body.add(new Point(b.get("x").asInt(), b.get("y").asInt()));
-                }
-                
-                // Add to enemies
-                if (!id.equals(myId)) enemies.add(new Enemy(id, len, body.get(0)));
-
-                // Mark blocked
-                // HEAD is blocked
-                // BODY is blocked
-                // TAIL... depends.
-                for (int i = 0; i < body.size(); i++) {
-                    Point p = body.get(i);
-                    if (!isValid(p)) continue;
-                    
-                    // Tail logic: If snake is eating this turn, tail stays.
-                    // We don't know if they are eating, so assume they MIGHT not? No, safer to assume Blocked.
-                    // BUT for our OWN tail, if we didn't eat, it will move. 
-                    // Simplified: Block everything.
-                    if (i == body.size() - 1) { 
-                        // It's the tail.
-                        boolean isMe = id.equals(myId);
-                        boolean isEating = false;
-                        
-                        // Check if head is adjacent to food
-                        List<Point> headNeighbors = new ArrayList<>();
-                        for (int[] d : DIRS) {
-                            Point n = new Point(body.get(0).x + d[0], body.get(0).y + d[1]);
-                            if (isWrapped) n = wrap(n);
-                            headNeighbors.add(n);
-                        }
-                        
-                        for (Point f : foods) {
-                            if (headNeighbors.contains(f)) {
-                                isEating = true;
-                                break;
-                            }
-                        }
-                        
-                        // If it's me and I'm not eating, tail is free
-                        if (isMe && !isEating) {
-                             blocked[p.x][p.y] = false;
-                        } else {
-                             blocked[p.x][p.y] = true;
-                        }
-                    } else {
-                        blocked[p.x][p.y] = true;
-                    }
-                }
-            }
-            isSmallest = myLen <= maxLen;
+            return next;
         }
 
         boolean isValid(Point p) {
-            if (isWrapped) return true; // Always on board
-            return p.x >= 0 && p.x < W && p.y >= 0 && p.y < H;
+            return p.x >= 0 && p.x < width && p.y >= 0 && p.y < height;
         }
-
+        
         boolean isBlocked(Point p) {
-            Point check = isWrapped ? wrap(p) : p;
-            if (!isValid(check)) return true;
-            return blocked[check.x][check.y];
-        }
-
-        boolean isHazard(Point p) {
-            Point check = isWrapped ? wrap(p) : p;
-            return isValid(check) && hazards[check.x][check.y];
-        }
-        
-        Point wrap(Point p) {
-            int nx = (p.x % W + W) % W;
-            int ny = (p.y % H + H) % H;
-            return new Point(nx, ny);
-        }
-        
-        int dist(Point a, Point b) {
-            if (isWrapped) {
-                 int dx = Math.abs(a.x - b.x);
-                 int dy = Math.abs(a.y - b.y);
-                 return Math.min(dx, W - dx) + Math.min(dy, H - dy);
+            if (!isValid(p)) return true;
+            // Check my body
+            for (int i=0; i<myBody.size()-1; i++) { // Ignore tail? No, simulated state has handled tail removal.
+                if (myBody.get(i).equals(p)) return true;
             }
-            return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-        }
-        
-        // BFS for food pathfinding
-        int bfsDist(Point start, Point target) {
-            if (start.equals(target)) return 0;
-            boolean[][] v = new boolean[W][H];
-            Queue<int[]> q = new LinkedList<>();
-            q.add(new int[]{start.x, start.y, 0});
-            v[start.x][start.y] = true;
-            
-            while(!q.isEmpty()) {
-                int[] c = q.poll();
-                int x=c[0], y=c[1], d=c[2];
-                if (x == target.x && y == target.y) return d;
-                
-                for(int[] dir : DIRS) {
-                    int nx = x + dir[0];
-                    int ny = y + dir[1];
-                     if (isWrapped) {
-                        nx = (nx + W) % W;
-                        ny = (ny + H) % H;
-                    }
-                    if (isValid(new Point(nx, ny)) && !v[nx][ny] && !blocked[nx][ny]) {
-                        v[nx][ny] = true;
-                        q.add(new int[]{nx, ny, d+1});
-                    }
+            // Check enemies
+            for (Enemy e : enemies) {
+                for (Point b : e.body) {
+                    if (b.equals(p)) return true;
                 }
             }
-            return -1;
+            return false;
+        }
+        
+        List<Point> neighbors(Point p) {
+            List<Point> res = new ArrayList<>();
+            int[][] dirs = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+            for (int[] d : dirs) {
+                Point n = new Point(p.x+d[0], p.y+d[1]);
+                if (isValid(n)) res.add(n);
+            }
+            return res;
+        }
+        
+        Point moveDelta(String m) {
+            if (m.equals("up")) return new Point(0, 1);
+            if (m.equals("down")) return new Point(0, -1);
+            if (m.equals("left")) return new Point(-1, 0);
+            return new Point(1, 0); // right
         }
     }
 
     static class Point {
         int x, y;
-        public Point(int x, int y) { this.x = x; this.y = y; }
-        public Point add(int[] d) { return new Point(x + d[0], y + d[1]); }
+        Point(int x, int y) { this.x=x; this.y=y; }
         @Override public boolean equals(Object o) {
-            if (this == o) return true;
+            if (this==o) return true;
             if (!(o instanceof Point)) return false;
-            Point point = (Point) o;
-            return x == point.x && y == point.y;
+            Point p = (Point)o;
+            return x==p.x && y==p.y;
         }
+    }
+    
+    static int dist(Point a, Point b) {
+        return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     }
 
     static class Enemy {
         String id;
-        int len;
+        List<Point> body;
         Point head;
-        public Enemy(String id, int len, Point head) { this.id = id; this.len = len; this.head = head; }
+        Enemy(String id, List<Point> body) { this.id=id; this.body=body; this.head=body.get(0); }
+        Enemy(Enemy other) {
+            this.id = other.id;
+            this.body = new ArrayList<>(other.body);
+            this.head = other.head;
+        }
+    }
+    
+    static class MoveScore {
+        String move;
+        double score;
+        MoveScore(String m, double s) { move=m; score=s; }
     }
 }
