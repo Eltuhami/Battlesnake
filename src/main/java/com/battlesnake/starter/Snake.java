@@ -209,8 +209,8 @@ public class Snake {
         
         // Center Bias in Simulation
         int cx = state.W / 2, cy = state.H / 2;
-        int dist = Math.abs(myHead.x - cx) + Math.abs(myHead.y - cy);
-        score -= dist * W_CENTER;
+        int distToCenter = Math.abs(myHead.x - cx) + Math.abs(myHead.y - cy);
+        score -= distToCenter * W_CENTER;
 
         // Space (flood fill on simulated board)
         int space = floodFillGrid(state.W, state.H, state.isWrapped, myHead, sim, myLen * 3);
