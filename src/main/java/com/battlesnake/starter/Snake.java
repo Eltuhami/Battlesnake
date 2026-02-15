@@ -35,7 +35,7 @@ public class Snake {
 
     // History for Boredom System
     private static final LinkedList<Point> HISTORY = new LinkedList<>();
-    private static final int HISTORY_SIZE = 10;
+    private static final int HISTORY_SIZE = 100; // V23.2: Huge memory to prevent large loops
 
     // ============================================================
     // MAIN + ROUTES
@@ -56,8 +56,8 @@ public class Snake {
     static Map<String, String> index() {
         Map<String, String> r = new HashMap<>();
         r.put("apiversion", "1");
-        r.put("author", "GODMODE-V23-PREDATOR");
-        r.put("color", "#8B0000"); // Dark Red (Predator)
+        r.put("author", "GODMODE-V23.2-ANTILOOP");
+        r.put("color", "#8B0000"); // Dark Red
         r.put("head", "fang");
         r.put("tail", "hook");
         // Constrictor overrides (visual only, server overrides this)
@@ -93,6 +93,10 @@ public class Snake {
              depth = 2; // Safety for constrictor which fills board
         }
 
+        // Recursion loop detection
+        Set<Point> currentPath = new HashSet<>();
+        currentPath.add(state.myHead);
+
         for (int i = 0; i < 4; i++) {
             Point next = state.myHead.add(DIRS[i]);
             if (state.isWrapped) next = state.wrap(next);
@@ -106,7 +110,7 @@ public class Snake {
             }
 
             // RECURSIVE SEARCH
-            double score = search(state, next, depth, startTime);
+            double score = search(state, next, depth, startTime, currentPath);
 
             if (score > maxScore) {
                 maxScore = score;
@@ -126,7 +130,7 @@ public class Snake {
     // PREDICTIVE SEARCH
     // ============================================================
 
-    private static double search(GameState state, Point myMove, int depth, long startTime) {
+    private static double search(GameState state, Point myMove, int depth, long startTime, Set<Point> path) {
         // 1. Simulate MY move
         GameState nextState = state.cloneState();
         nextState.advanceMySnake(myMove);
@@ -134,9 +138,13 @@ public class Snake {
         if (nextState.amIDead()) return SCORE_CERTAIN_DEATH;
         if (nextState.hasWon()) return SCORE_WIN;
         
+        // Add current move to temporary path for loop checking
+        Set<Point> nextPath = new HashSet<>(path);
+        nextPath.add(myMove);
+
         // 2. Base Case
         if (depth == 0 || System.currentTimeMillis() - startTime > 400) {
-            return evaluate(nextState, myMove); // Evaluate the resulting state
+            return evaluate(nextState, myMove, nextPath); // Evaluate the resulting state with path context
         }
 
         // 3. Simulate OPPONENTS (The "Prediction")
@@ -158,7 +166,7 @@ public class Snake {
             if (!nextState.isValid(p) || nextState.isBlocked(p)) continue;
             
             canMove = true;
-            double val = search(nextState, p, depth - 1, startTime);
+            double val = search(nextState, p, depth - 1, startTime, nextPath);
             bestVal = Math.max(bestVal, val);
         }
         
@@ -172,10 +180,10 @@ public class Snake {
     // EVALUATE
     // ============================================================
 
-    private static double evaluate(GameState state, Point myHead) {
+    private static double evaluate(GameState state, Point myHead, Set<Point> recursionPath) {
         // CONSTRICTOR OVERRIDE
         if (state.isConstrictor) {
-            return evaluateConstrictor(state, myHead);
+            return evaluateConstrictor(state, myHead, recursionPath);
         }
 
         double score = 0;
@@ -191,10 +199,9 @@ public class Snake {
         // 3. AGGRESSION
         score += aggressionScore(state, myHead);
 
-        // 4. BOREDOM (Anti-Loop) - ONLY at root? 
-        // No, we can apply it here based on true history.
-        // If the *simulated* head is in *real* history, bad.
-        if (HISTORY.contains(myHead)) {
+        // 4. BOREDOM (Anti-Loop) - Improved V23.2
+        // If the *simulated* head is in *real* history OR *simulated* past, bad.
+        if (HISTORY.contains(myHead) || (recursionPath != null && recursionPath.contains(myHead))) {
             score -= 50_000.0; 
         }
 
@@ -206,7 +213,7 @@ public class Snake {
         return score;
     }
 
-    private static double evaluateConstrictor(GameState state, Point myHead) {
+    private static double evaluateConstrictor(GameState state, Point myHead, Set<Point> recursionPath) {
          // In Constrictor:
          // - No food eating (it kills space).
          // - Maximize OPEN SPACE.
@@ -227,7 +234,9 @@ public class Snake {
          score -= dist * 10.0; 
          
          // History still applies to prevent loops
-         if (HISTORY.contains(myHead)) score -= 50_000.0;
+         if (HISTORY.contains(myHead) || (recursionPath != null && recursionPath.contains(myHead))) {
+             score -= 50_000.0;
+         }
 
          return score;
     }
