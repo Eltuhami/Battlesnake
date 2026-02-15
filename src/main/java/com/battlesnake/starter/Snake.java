@@ -25,9 +25,10 @@ public class Snake {
     private static final double SCORE_CERTAIN_DEATH = -10_000_000.0;
 
     // Strategy weights
-    private static final double W_TERRITORY  = 15.0;
-    private static final double W_SPACE      = 5.0;
-    private static final double W_AGGRESSION = 10.0;
+    private static final double W_TERRITORY  = 1.0;   // V22.2: Drastically reduced to stop spinning
+    private static final double W_SPACE      = 15.0;  // V22.2: Increased to prioritize freedom
+    private static final double W_AGGRESSION = 20.0;  // V22.2: Increased to force interaction
+    private static final double W_CENTER     = 10.0;  // V22.2: Anchoring
 
     // ============================================================
     // MAIN + ROUTES
@@ -183,10 +184,13 @@ public class Snake {
         // Edge avoidance
         score += edgeScore(state, myNext);
 
-        // V22.1 FIX: Anti-Spin (Center Bias)
+        // V22.2 FIX: Anti-Spin (Center Bias)
         int cx = state.W / 2, cy = state.H / 2;
         int distToCenter = Math.abs(myNext.x - cx) + Math.abs(myNext.y - cy);
-        score -= distToCenter * 5.0; // Weak pull to break loops
+        score -= distToCenter * W_CENTER;
+
+        // V22.2 FIX: Noise to break symmetry/loops
+        score += new Random().nextDouble() * 0.5;
 
         return score;
     }
@@ -375,6 +379,9 @@ public class Snake {
         // V22.1 FIX: Starvation Urgency
         if (state.myHealth < 20) urgency = Math.max(urgency, 5.0);
         else if (state.myHealth < 50) urgency = Math.max(urgency, 2.5);
+
+        // V22.2 FIX: Always have SOME hunger to prevent idle spinning
+        if (urgency < 0.1) urgency = 0.1;
 
         double best = 0;
         for (Point f : state.foods) {
