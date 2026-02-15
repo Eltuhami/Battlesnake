@@ -408,22 +408,26 @@ public class Snake {
         }
 
         void advanceMySnake(Point nextHead) {
-            // Simplified advance: Move head, don't worry about tail logic for lookahead (too complex/negligible for 2-ply)
-            // Just block the new head.
             if (isWrapped) nextHead = wrap(nextHead);
-            myHead = nextHead;
-            markBlocked(myHead);
-            // Assume we ate if food? (For length calc if needed)
-            if (foods.contains(nextHead)) {
-                myLen++; 
-                myHealth = 100;
-                foods.remove(nextHead); // Consumed
+            
+            // Check death BEFORE we move/mark
+            // If we hit a blocked cell (body/wall), we die.
+            if (!isValid(nextHead) || blocked[nextHead.x][nextHead.y]) {
+                myHealth = 0; // Mark as dead
             } else {
                 myHealth--;
+                if (foods.contains(nextHead)) {
+                     myLen++;
+                     myHealth = 100;
+                     foods.remove(nextHead);
+                }
             }
+
+            myHead = nextHead;
+            markBlocked(myHead); // Mark it now
         }
-        
-        void advanceEnemiesPredictively() {
+
+    void advanceEnemiesPredictively() {
             // For each enemy, pick their BEST immediate move and execute it.
             for (SnakeData e : aliveEnemies) {
                 // Heuristic choice for enemy
@@ -461,16 +465,9 @@ public class Snake {
                 }
             }
         }
-        
+
         boolean amIDead() {
-            if (myHealth <= 0) return true;
-            // Check if my head is on a hazard? No, simplified.
-            // Check OOB?
-            return !isValid(myHead) || blocked[myHead.x][myHead.y]; 
-            // NOTE: In `advanceMySnake`, we markBlocked(myHead). So this check fails if we check AFTER moving.
-            // We should check collision BEFORE marking blocked in advance.
-            // But for simple recursion, if recursive step returns DEAD, we bubble up.
-            // Since we implemented "generate valid moves" in loop, we rarely step into death unless enemies kill us.
+            return myHealth <= 0;
         }
         
         boolean hasWon() {
