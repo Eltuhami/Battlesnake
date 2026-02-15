@@ -492,6 +492,10 @@ public class Snake {
             return new Point((p.x % W + W) % W, (p.y % H + H) % H);
         }
         
+        int dist(Point a, Point b) {
+            return manhattan(a, b, W, H, isWrapped);
+        }
+
         int bfsDist(Point start, Point target) {
              // simplified dist for perf
              return manhattan(start, target, W, H, isWrapped);
