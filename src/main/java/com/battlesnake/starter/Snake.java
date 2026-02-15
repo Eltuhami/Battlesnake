@@ -25,10 +25,10 @@ public class Snake {
     private static final double SCORE_CERTAIN_DEATH = -10_000_000.0;
 
     // Strategy weights
-    private static final double W_TERRITORY  = 2.0;  // Reduced from 15.0 to prevent obsession
-    private static final double W_SPACE      = 10.0; // Increased to prioritize survival
+    private static final double W_TERRITORY  = 1.0;   // Reduced further
+    private static final double W_SPACE      = 5.0;   // Moderate
     private static final double W_AGGRESSION = 10.0;
-    private static final double W_CENTER     = 5.0;  // New center bias
+    private static final double W_CENTER     = 50.0;  // STRONG bias to stop spinning
 
     // ============================================================
     // MAIN + ROUTES
@@ -254,11 +254,17 @@ public class Snake {
             if (state.myHealth <= state.hazardDamage + 5) return SCORE_IMPOSSIBLE;
         }
 
-        // Head-to-head risk
+        // Head-to-head risk - STRICT
         for (SnakeData e : state.aliveEnemies) {
             int d = state.dist(next, e.head);
             if (d == 1) {
-                score += (e.len >= state.myLen) ? -500000 : 5000;
+                // If they are bigger or EQUAL, it's a death wall. Do not risk 50/50.
+                if (e.len >= state.myLen) {
+                    return SCORE_IMPOSSIBLE;
+                } else {
+                    // We are bigger, we can bully them
+                    score += 5000;
+                }
             }
         }
 
@@ -371,17 +377,18 @@ public class Snake {
         int maxELen = 0;
         for (SnakeData e : state.aliveEnemies) maxELen = Math.max(maxELen, e.len);
 
-        // Base urgency
         double urgency = 1.0;
         
-        // CRITICAL HUNGER: If < 35 health, simply MUST eat.
-        // Overrides territory and simple safety (but not death).
-        if (state.myHealth < 35) {
-            urgency = 100.0; 
-        } else if (state.myLen < maxELen) {
-            urgency = 5.0; // Need to grow to compete
+        // V2: HARD STARVATION OVERRIDE
+        if (state.myHealth < 40) {
+           return 10_000_000.0; // BASE VALUE for eating. Overrides everything.
+        }
+
+        // Standard hunger
+        if (state.myLen < maxELen) {
+            urgency = 10.0;
         } else if (state.myHealth < 70) {
-            urgency = 2.0; // Maintain buffer
+            urgency = 5.0;
         }
 
         double best = 0;
@@ -389,17 +396,9 @@ public class Snake {
             int d = state.bfsDist(next, f);
             if (d == -1) continue;
             
-            // Base value 1000. With urgency 100 (hungry), this is 100,000.
-            // With urgency 1 (full), this is 1,000.
             double val = 1000.0 * urgency;
-
-            // Denial bonus (eat if we are closer than enemy)
-            for (SnakeData e : state.aliveEnemies) {
-                int ed = state.dist(e.head, f);
-                if (d < ed && e.len < state.myLen) val += 500;
-            }
-
-            double s = val / (d + 1);
+            // Distance penalty
+            double s = val / (d * d + 1); // Quadratic falloff to prioritize CLOSE food
             if (s > best) best = s;
         }
         return best;
