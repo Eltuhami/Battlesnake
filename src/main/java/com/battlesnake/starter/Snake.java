@@ -159,6 +159,10 @@ public class Snake {
         if (space < requiredSpace) {
             // TRAP!
             score += SCORE_CERTAIN_DEATH + (space * 1000); 
+        } else if (space < requiredSpace * 2) {
+            // WARNING ZONE: Space exists but it's tight. Penalize proportionally.
+            double tightness = (double) space / (requiredSpace * 2);
+            score += space * 5 - (1 - tightness) * 5000;
         } else {
             // Plenty of space.
             if (state.isConstrictor) {
@@ -167,6 +171,15 @@ public class Snake {
                 score += space * 5; 
             }
         }
+
+        // Corridor detection: prefer moves with more open neighbors (escape routes)
+        int openNeighbors = 0;
+        for (int[] d : DIRS) {
+            Point nb = next.add(d);
+            if (state.isWrapped) nb = state.wrap(nb);
+            if (state.isValid(nb) && !state.isBlocked(nb)) openNeighbors++;
+        }
+        score += openNeighbors * 100;
 
         // --- 3. FOOD & OBJECTIVES ---
         
@@ -206,11 +219,15 @@ public class Snake {
         }
 
         // --- 4. STRATEGIC BIAS ---
-        if (!state.isRoyale && !state.isConstrictor && state.turn < 100) {
+        if (!state.isConstrictor) {
             int cx = state.W / 2;
             int cy = state.H / 2;
             int distCenter = Math.abs(next.x - cx) + Math.abs(next.y - cy);
-            score -= distCenter * 10;
+            score -= distCenter * 5;
+            // Extra penalty for being right on the wall (1 step from being cornered)
+            if (next.x == 0 || next.x == state.W - 1 || next.y == 0 || next.y == state.H - 1) {
+                score -= 200;
+            }
         }
 
         // --- 5. DUEL MODE (1v1) ---
@@ -262,7 +279,7 @@ public class Snake {
             Point p = q.poll();
             count++;
             
-            if (count >= state.myLen * 2) return count;
+            if (count >= state.myLen * 3) return count;
 
             for (int[] d : DIRS) {
                 Point n = p.add(d);
