@@ -485,9 +485,10 @@ public class Snake {
             Point p = q.poll(); count++;
             if (count >= cap) return count;
             for (int[] d : DIRS) {
-                Point n = p.add(d);
-                if (state.isWrapped) n = state.wrap(n);
-                if (state.isValid(n) && !visited[n.x][n.y]) {
+                int nx = p.x + d[0];
+                int ny = p.y + d[1];
+                if (isWrapped) { nx = (nx % W + W) % W; ny = (ny % H + H) % H; }
+                if (nx >= 0 && nx < W && ny >= 0 && ny < H && !v[nx][ny]) {
                     v[nx][ny] = true; q.add(new Point(nx, ny));
                 }
             }
