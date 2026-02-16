@@ -10,14 +10,11 @@ import java.util.*;
 import static spark.Spark.*;
 
 /**
- * INTELLIGENT SNAKE v2.0 - MINIMAX
- * Fixes:
- *  - Fixed infinite recursion bug in minimax (depth not decrementing)
- *  - Safety fallback: pick random safe move if search times out completely
- *  - Tail-chase: consider own tail as reachable in flood fill (it moves away)
- *  - Hazard zones only block flood fill for LARGER enemies, not equal
- *  - Better wall-avoidance and corner-avoidance scoring
- *  - Enhanced logging: per-move scores at root
+ * GODMODE SNAKE v23.0 - SMART PREDATOR + CONSTRICTOR
+ * Features:
+ * 1. Predictive Minimax (Depth 3) - Solves "Dead Ends"
+ * 2. Constrictor Mode Logic - Solves "Cluelessness"
+ * 3. Boredom System - Solves "Spinning"
  */
 public class Snake {
     private static final ObjectMapper JSON = new ObjectMapper();
@@ -26,23 +23,32 @@ public class Snake {
     private static final int[][] DIRS = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}};
     private static final String[] DIR_NAMES = {"up", "down", "left", "right"};
 
-    // --- MINIMAX SETTINGS ---
-    private static final int MAX_DEPTH_LIMIT = 10;
-    private static final long TIME_LIMIT_MS = 280; // Leave 120ms buffer for network
+    // --- SCORING CONSTANTS ---
+    private static final double SCORE_IMPOSSIBLE    = -1_000_000_000.0;
+    private static final double SCORE_CERTAIN_DEATH = -10_000_000.0;
+    private static final double SCORE_WIN           =  100_000_000.0;
 
-    // --- SCORING WEIGHTS ---
-    private static final double W_SPACE      = 12.0;
-    private static final double W_FOOD       = 30.0;
-    private static final double W_HEALTH     = 3.0;
-    private static final double W_CENTER     = 3.0;
-    private static final double W_LENGTH     = 800.0;
-    private static final double W_WALL       = 5.0;
+    // Strategy weights (V23 Standard)
+    private static final double W_SPACE      = 20.0;
+    private static final double W_AGGRESSION = 30.0;
+    private static final double W_CENTER     = 10.0;
+
+    // History for Boredom System
+    private static final LinkedList<Point> HISTORY = new LinkedList<>();
+    private static final int HISTORY_SIZE = 10;
+
+    // ============================================================
+    // MAIN + ROUTES
+    // ============================================================
 
     public static void main(String[] args) {
         String port = System.getProperty("PORT", "8082");
         port(Integer.parseInt(port));
         get("/", (req, res) -> JSON.writeValueAsString(index()));
-        post("/start", (req, res) -> "{}");
+        post("/start", (req, res) -> {
+            HISTORY.clear();
+            return "{}";
+        });
         post("/move", (req, res) -> JSON.writeValueAsString(move(JSON.readTree(req.body()))));
         post("/end", (req, res) -> "{}");
     }
@@ -50,196 +56,219 @@ public class Snake {
     static Map<String, String> index() {
         Map<String, String> r = new HashMap<>();
         r.put("apiversion", "1");
-        r.put("author", "AntiGravity-v2");
-        r.put("color", "#00AAFF");
-        r.put("head", "smart-caterpillar");
-        r.put("tail", "curled");
+        r.put("author", "GODMODE-V23-PREDATOR");
+        r.put("color", "#8B0000"); // Dark Red (Predator)
+        r.put("head", "fang");
+        r.put("tail", "hook");
+        // Constrictor overrides (visual only, server overrides this)
         return r;
     }
+
+    // ============================================================
+    // MOVE DECISION
+    // ============================================================
 
     static Map<String, String> move(JsonNode root) {
         long startTime = System.currentTimeMillis();
         GameState state = new GameState(root);
-        String bestMove = getBestMove(state, startTime);
+        
+        // Update History
+        if (!HISTORY.isEmpty() && !HISTORY.getLast().equals(state.myHead)) {
+            HISTORY.add(state.myHead);
+        } else if (HISTORY.isEmpty()) {
+            HISTORY.add(state.myHead);
+        }
+        if (HISTORY.size() > HISTORY_SIZE) HISTORY.removeFirst();
 
-        long elapsed = System.currentTimeMillis() - startTime;
-        LOG.info("Turn {}: {} ({}ms)", state.turn, bestMove, elapsed);
+        String bestDir = "up";
+        double maxScore = -Double.MAX_VALUE;
 
+        // PREDICTIVE MINIMAX (Depth 2-3)
+        // We use Depth 3 if few snakes, Depth 2 if many (timeout protection)
+        int depth = (state.aliveEnemies.size() > 2) ? 2 : 3;
+        
+        // Debugging Constrictor
+        if (state.isConstrictor) {
+             LOG.info("CONSTRICTOR MODE ACTIVE");
+             depth = 2; // Safety for constrictor which fills board
+        }
+
+        for (int i = 0; i < 4; i++) {
+            Point next = state.myHead.add(DIRS[i]);
+            if (state.isWrapped) next = state.wrap(next);
+
+            if (!state.isValid(next) || state.isBlocked(next)) {
+                if (SCORE_IMPOSSIBLE > maxScore) {
+                    maxScore = SCORE_IMPOSSIBLE;
+                    bestDir = DIR_NAMES[i];
+                }
+                continue;
+            }
+
+            // RECURSIVE SEARCH
+            double score = search(state, next, depth, startTime);
+
+            if (score > maxScore) {
+                maxScore = score;
+                bestDir = DIR_NAMES[i];
+            }
+        }
+        
+        long timeTaken = System.currentTimeMillis() - startTime;
+        LOG.info("Turn {}: Best move {} score {} ({}ms)", state.turn, bestDir, maxScore, timeTaken);
+        
         Map<String, String> res = new HashMap<>();
-        res.put("move", bestMove);
+        res.put("move", bestDir);
         return res;
     }
 
     // ============================================================
-    // MINIMAX ENGINE
+    // PREDICTIVE SEARCH
     // ============================================================
 
-    private static String getBestMove(GameState rootState, long startTime) {
-        List<String> moves = rootState.getLegalMoves();
-        if (moves.isEmpty()) {
-            // Desperate: try ALL 4 directions including hazard zones
-            moves = rootState.getAllMoves();
-            if (moves.isEmpty()) {
-                LOG.warn("Turn {}: TRULY NO MOVES!", rootState.turn);
-                return "up";
-            }
-            LOG.warn("Turn {}: No safe moves, trying hazard moves: {}", rootState.turn, moves);
+    private static double search(GameState state, Point myMove, int depth, long startTime) {
+        // 1. Simulate MY move
+        GameState nextState = state.cloneState();
+        nextState.advanceMySnake(myMove);
+        
+        if (nextState.amIDead()) return SCORE_CERTAIN_DEATH;
+        if (nextState.hasWon()) return SCORE_WIN;
+        
+        // 2. Base Case
+        if (depth == 0 || System.currentTimeMillis() - startTime > 400) {
+            return evaluate(nextState, myMove); // Evaluate the resulting state
         }
 
-        // Safety Fallback: start with first legal move
-        String bestMove = moves.get(0);
-        double bestScore = -Double.MAX_VALUE;
+        // 3. Simulate OPPONENTS (The "Prediction")
+        // Instead of trying all combos, we move each enemy to their BEST heuristic spot.
+        // This makes the world deterministic-ish but aggressive.
+        nextState.advanceEnemiesPredictively();
+        
+        if (nextState.amIDead()) return SCORE_CERTAIN_DEATH; // They killed me!
 
-        // Evaluate each move at depth 0 first (pure evaluation, instant)
-        Map<String, Double> rootScores = new LinkedHashMap<>();
-        for (String move : moves) {
-            GameState next = rootState.advance(move);
-            double score = evaluate(next);
-            rootScores.put(move, score);
-            if (score > bestScore) {
-                bestScore = score;
-                bestMove = move;
-            }
+        // 4. Recursive Step (Max Layer)
+        // Now it's my turn again in this simulated future.
+        double bestVal = -Double.MAX_VALUE;
+        boolean canMove = false;
+        
+        for (int[] d : DIRS) {
+            Point p = nextState.myHead.add(d);
+            if (nextState.isWrapped) p = nextState.wrap(p);
+            
+            if (!nextState.isValid(p) || nextState.isBlocked(p)) continue;
+            
+            canMove = true;
+            double val = search(nextState, p, depth - 1, startTime);
+            bestVal = Math.max(bestVal, val);
         }
-
-        // Iterative Deepening
-        for (int depth = 1; depth <= MAX_DEPTH_LIMIT; depth++) {
-            if (System.currentTimeMillis() - startTime > TIME_LIMIT_MS) break;
-
-            String depthBestMove = bestMove;
-            double depthBestScore = -Double.MAX_VALUE;
-            boolean completed = true;
-            StringBuilder sb = new StringBuilder();
-
-            for (String move : moves) {
-                if (System.currentTimeMillis() - startTime > TIME_LIMIT_MS) {
-                    completed = false;
-                    break;
-                }
-
-                GameState next = rootState.advance(move);
-                double score = minimax(next, depth - 1, -Double.MAX_VALUE, Double.MAX_VALUE, startTime);
-
-                sb.append(move).append("=").append((long) score).append(" ");
-
-                if (score > depthBestScore) {
-                    depthBestScore = score;
-                    depthBestMove = move;
-                }
-            }
-
-            if (completed) {
-                bestMove = depthBestMove;
-                bestScore = depthBestScore;
-                LOG.info("Turn {} D{}: {} -> {}", rootState.turn, depth, sb, bestMove);
-            } else {
-                break;
-            }
-        }
-
-        return bestMove;
-    }
-
-    /**
-     * Single-agent Minimax (no explicit opponent modeling).
-     * We search OUR moves at each depth level.
-     */
-    private static double minimax(GameState state, int depth, double alpha, double beta, long startTime) {
-        if (System.currentTimeMillis() - startTime > TIME_LIMIT_MS) return 0;
-
-        if (depth == 0 || state.isGameOver()) {
-            return evaluate(state);
-        }
-
-        double maxEval = -Double.MAX_VALUE;
-        List<String> moves = state.getLegalMoves();
-
-        if (moves.isEmpty()) return -1_000_000; // No moves = death
-
-        for (String move : moves) {
-            if (System.currentTimeMillis() - startTime > TIME_LIMIT_MS) return 0;
-
-            GameState next = state.advance(move);
-            double eval = minimax(next, depth - 1, alpha, beta, startTime);
-            maxEval = Math.max(maxEval, eval);
-            alpha = Math.max(alpha, eval);
-            if (beta <= alpha) break; // Pruning
-        }
-        return maxEval;
+        
+        if (!canMove) return SCORE_CERTAIN_DEATH; // Trapped
+        
+        // Decay score slightly with depth to prefer seeking NOW
+        return bestVal * 0.99;
     }
 
     // ============================================================
-    // EVALUATION
+    // EVALUATE
     // ============================================================
 
-    private static double evaluate(GameState state) {
-        if (state.myHealth <= 0) return -1_000_000;
-        // Note: do NOT check isBlocked(myHead) here — myHead is in obstacles
-        // after advance() for future collision detection, but it's our valid position.
+    private static double evaluate(GameState state, Point myHead) {
+        // CONSTRICTOR OVERRIDE
+        if (state.isConstrictor) {
+            return evaluateConstrictor(state, myHead);
+        }
 
         double score = 0;
 
-        // 1. Flood Fill (reachable space from head)
-        int space = floodFill(state, state.myHead, state.myLen * 3);
-        if (space < state.myLen) {
-            // Trapped! Severe penalty, but proportional to how trapped
-            return -500_000 + (space * 1000);
-        }
+        // 1. SPACE (Freedom)
+        int space = floodFillGrid(state.W, state.H, state.isWrapped, myHead, state.blocked, state.myLen * 3);
+        if (space < state.myLen) return SCORE_CERTAIN_DEATH + space * 1000;
         score += space * W_SPACE;
 
-        // 2. Food proximity (urgency-based)
-        double foodUrgency = 1.0;
-        if (state.myHealth < 25) foodUrgency = 8.0;      // Critical!
-        else if (state.myHealth < 50) foodUrgency = 4.0;  // Hungry
-        else if (state.myHealth < 75) foodUrgency = 2.0;  // Getting there
+        // 2. FOOD
+        score += foodScore(state, myHead);
 
-        int distToFood = getClosestFoodDist(state);
-        if (distToFood != Integer.MAX_VALUE) {
-            score += (500.0 / (distToFood + 1)) * foodUrgency * W_FOOD;
-        }
-        // Starving and no food nearby? Extra penalty
-        if (state.myHealth < 20 && distToFood > 5) {
-            score -= 5000;
+        // 3. AGGRESSION
+        score += aggressionScore(state, myHead);
+
+        // 4. BOREDOM (Anti-Loop) - ONLY at root? 
+        // No, we can apply it here based on true history.
+        // If the *simulated* head is in *real* history, bad.
+        if (HISTORY.contains(myHead)) {
+            score -= 50_000.0; 
         }
 
-        // 3. Health
-        score += state.myHealth * W_HEALTH;
+        // 5. CENTER BIAS (Anchor)
+        int cx = state.W / 2, cy = state.H / 2;
+        int distToCenter = Math.abs(myHead.x - cx) + Math.abs(myHead.y - cy);
+        score -= distToCenter * W_CENTER;
 
-        // 4. Center control (avoid edges and corners where traps happen)
-        if (!state.isWrapped) {
-            int distEdgeX = Math.min(state.myHead.x, state.W - 1 - state.myHead.x);
-            int distEdgeY = Math.min(state.myHead.y, state.H - 1 - state.myHead.y);
+        return score;
+    }
 
-            // Heavy penalty for being directly on an edge
-            if (distEdgeX == 0 || distEdgeY == 0) score -= W_WALL * 3;
-            // Extra penalty for corners
-            if (distEdgeX == 0 && distEdgeY == 0) score -= W_WALL * 10;
+    private static double evaluateConstrictor(GameState state, Point myHead) {
+         // In Constrictor:
+         // - No food eating (it kills space).
+         // - Maximize OPEN SPACE.
+         // - Avoid self-traps strictly.
+         
+         double score = 0;
+         
+         // Heavily weight space
+         int space = floodFillGrid(state.W, state.H, state.isWrapped, myHead, state.blocked, 1000);
+         score += space * 100.0;
+         
+         // If space is tight, Panic
+         if (space < state.myLen + 10) score -= 1_000_000;
 
-            // General center preference
-            int distCenter = Math.abs(state.myHead.x - state.W / 2) + Math.abs(state.myHead.y - state.H / 2);
-            score -= distCenter * W_CENTER;
+         // Edge Avoidance (Don't hug walls too early)
+         int cx = state.W / 2, cy = state.H / 2;
+         int dist = Math.abs(myHead.x - cx) + Math.abs(myHead.y - cy);
+         score -= dist * 10.0; 
+         
+         // History still applies to prevent loops
+         if (HISTORY.contains(myHead)) score -= 50_000.0;
+
+         return score;
+    }
+
+    // ============================================================
+    // SCORING HELPERS
+    // ============================================================
+
+    private static double foodScore(GameState state, Point next) {
+        if (state.isConstrictor) return 0; // IGNORE FOOD
+
+        int maxELen = 0;
+        for (SnakeData e : state.aliveEnemies) maxELen = Math.max(maxELen, e.len);
+
+        double urgency = 1.0;
+        if (state.myLen > maxELen + 2) urgency = 0.5;
+        else if (state.myLen < maxELen) urgency = 3.0;
+        if (state.myHealth < 40) urgency = 10.0;
+        if (urgency < 0.5) urgency = 0.5;
+
+        double best = 0;
+        for (Point f : state.foods) {
+            int d = state.bfsDist(next, f);
+            if (d == -1) continue;
+            double val = 1000.0 * urgency;
+            double s = val / (d + 1);
+            if (s > best) best = s;
         }
+        return best;
+    }
 
-        // 5. Length dominance
-        for (List<Point> enemy : state.enemies) {
-            if (state.myLen > enemy.size()) score += W_LENGTH;
-            else if (state.myLen < enemy.size()) score -= W_LENGTH * 0.5;
-        }
-
-        // 6. Head-to-head avoidance: penalize being adjacent to a larger snake's head
-        for (int i = 0; i < state.enemies.size(); i++) {
-            List<Point> enemy = state.enemies.get(i);
-            if (enemy.isEmpty()) continue;
-            Point eHead = enemy.get(0);
-            int dist = state.dist(state.myHead, eHead);
-            if (dist <= 2 && enemy.size() >= state.myLen) {
-                score -= 3000.0 / (dist + 1); // Closer = more dangerous
+    private static double aggressionScore(GameState state, Point next) {
+        double score = 0;
+        for (SnakeData e : state.aliveEnemies) {
+            int d = state.dist(next, e.head);
+            if (state.myLen > e.len) {
+                score += (1000.0 / (d + 1)) * W_AGGRESSION;
+            } else {
+                score += d * 5.0; 
             }
-            if (dist <= 2 && state.myLen > enemy.size()) {
-                score += 1500.0 / (dist + 1); // Aggression bonus
-            }
         }
-
         return score;
     }
 
@@ -247,205 +276,202 @@ public class Snake {
     // UTILS
     // ============================================================
 
-    static int floodFill(GameState state, Point start, int max) {
-        boolean[][] visited = new boolean[state.W][state.H];
-        // Mark obstacles except own tail (it will move away next turn)
-        for (Point p : state.obstacles) {
-            if (state.isValid(p)) {
-                visited[p.x][p.y] = true;
-            }
-        }
-        // Unblock our own tail — it will move away, so it's reachable
-        if (state.myBody.size() > 1) {
-            Point tail = state.myBody.get(state.myBody.size() - 1);
-            if (state.isValid(tail)) visited[tail.x][tail.y] = false;
-        }
-
-        if (state.isValid(start)) visited[start.x][start.y] = true;
-
+    static int floodFillGrid(int W, int H, boolean isWrapped, Point start,
+                             boolean[][] blocked, int cap) {
+        boolean[][] v = copyGrid(blocked, W, H);
         Queue<Point> q = new LinkedList<>();
-        q.add(start);
-
+        int sx = start.x, sy = start.y;
+        if (isWrapped) { sx = (sx % W + W) % W; sy = (sy % H + H) % H; }
+        if (sx >= 0 && sx < W && sy >= 0 && sy < H && !v[sx][sy]) {
+            q.add(new Point(sx, sy)); v[sx][sy] = true;
+        }
         int count = 0;
         while (!q.isEmpty()) {
-            Point p = q.poll();
-            count++;
-            if (count >= max) return count;
-
+            Point p = q.poll(); count++;
+            if (count >= cap) return count;
             for (int[] d : DIRS) {
-                Point next = p.add(d);
-                if (state.isWrapped) next = state.wrap(next);
-
-                if (state.isValid(next) && !visited[next.x][next.y]) {
-                    visited[next.x][next.y] = true;
-                    q.add(next);
+                int nx = p.x + d[0];
+                int ny = p.y + d[1];
+                if (isWrapped) { nx = (nx % W + W) % W; ny = (ny % H + H) % H; }
+                if (nx >= 0 && nx < W && ny >= 0 && ny < H && !v[nx][ny]) {
+                    v[nx][ny] = true; q.add(new Point(nx, ny));
                 }
             }
         }
         return count;
     }
 
-    static int getClosestFoodDist(GameState state) {
-        int min = Integer.MAX_VALUE;
-        for (Point f : state.foods) {
-            int d = state.dist(state.myHead, f);
-            if (d < min) min = d;
-        }
-        return min;
+    static boolean[][] copyGrid(boolean[][] src, int w, int h) {
+        boolean[][] c = new boolean[w][h];
+        for (int x = 0; x < w; x++) System.arraycopy(src[x], 0, c[x], 0, h);
+        return c;
+    }
+
+    static int manhattan(Point a, Point b, int W, int H, boolean wrapped) {
+        int dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y);
+        if (wrapped) { dx = Math.min(dx, W - dx); dy = Math.min(dy, H - dy); }
+        return dx + dy;
     }
 
     // ============================================================
-    // GAME STATE
+    // GAME STATE & SIMULATION
     // ============================================================
 
     static class GameState {
         int W, H, turn;
         int myHealth, myLen;
         Point myHead;
-        List<Point> myBody;
-        Set<Point> foods = new HashSet<>();
-        List<List<Point>> enemies = new ArrayList<>();
+        boolean[][] blocked;
+        boolean[][] hazards;
+        boolean isConstrictor, isWrapped;
+        int hazardDamage = 0;
+        List<Point> foods = new ArrayList<>();
+        List<SnakeData> aliveEnemies = new ArrayList<>();
 
-        Set<Point> hazardZones = new HashSet<>(); // Cells adjacent to larger enemy heads
-        Set<Point> obstacles = new HashSet<>();
-
-        boolean isWrapped;
-
-        // Root Constructor
+        // Helper for simple init
         GameState(JsonNode root) {
             JsonNode board = root.get("board");
-            W = board.get("width").asInt();
-            H = board.get("height").asInt();
+            W = board.get("width").asInt(); H = board.get("height").asInt();
             turn = root.get("turn").asInt();
-            JsonNode rules = root.get("game").get("ruleset");
-            isWrapped = rules.has("name") && rules.get("name").asText().contains("wrapped");
-
             JsonNode you = root.get("you");
+            String myId = you.get("id").asText();
             myHealth = you.get("health").asInt();
-            myBody = new ArrayList<>();
-            for (JsonNode b : you.get("body")) myBody.add(new Point(b.get("x").asInt(), b.get("y").asInt()));
-            myHead = myBody.get(0);
-            myLen = myBody.size();
-
-            for (JsonNode f : board.get("food")) foods.add(new Point(f.get("x").asInt(), f.get("y").asInt()));
-
+            myLen = you.get("body").size();
+            myHead = new Point(you.get("head").get("x").asInt(), you.get("head").get("y").asInt());
+            
+            JsonNode game = root.get("game");
+            String rules = "standard";
+            if (game != null && game.has("ruleset")) {
+                rules = game.get("ruleset").get("name").asText().toLowerCase();
+            }
+            isConstrictor = rules.contains("constrictor");
+            isWrapped = rules.contains("wrapped");
+            
+            blocked = new boolean[W][H];
+            hazards = new boolean[W][H];
+            
+            // Hazards
+             if (board.has("hazards")) {
+                for (JsonNode h : board.get("hazards")) {
+                    Point p = new Point(h.get("x").asInt(), h.get("y").asInt());
+                    if (isValid(p)) hazards[p.x][p.y] = true;
+                }
+            }
+            
+            // Food
+            for (JsonNode f : board.get("food")) {
+                Point p = new Point(f.get("x").asInt(), f.get("y").asInt());
+                foods.add(p);
+            }
+            
+            // Enemies & Myself blocking
+            // Important: We need to put myself in 'aliveEnemies' if I want to treat everyone same? No.
+            // But we need to mark my body as blocked.
+            for (JsonNode b : you.get("body")) markBlocked(new Point(b.get("x").asInt(), b.get("y").asInt()));
+            
             for (JsonNode s : board.get("snakes")) {
-                if (s.get("id").asText().equals(you.get("id").asText())) continue;
-                List<Point> enemyBody = new ArrayList<>();
-                for (JsonNode b : s.get("body")) enemyBody.add(new Point(b.get("x").asInt(), b.get("y").asInt()));
-                enemies.add(enemyBody);
-                obstacles.addAll(enemyBody);
-
-                // Hazard zones: cells adjacent to STRICTLY LARGER enemy heads
-                Point eHead = enemyBody.get(0);
-                if (enemyBody.size() > myLen) {  // STRICTLY larger, not equal
-                    for (int[] d : DIRS) {
-                        Point next = eHead.add(d);
-                        if (isWrapped) next = wrap(next);
-                        hazardZones.add(next);
-                    }
+                String id = s.get("id").asText();
+                if (id.equals(myId)) continue;
+                
+                int len = s.get("body").size();
+                List<Point> body = new ArrayList<>();
+                for (JsonNode b : s.get("body")) {
+                    Point p = new Point(b.get("x").asInt(), b.get("y").asInt());
+                    body.add(p);
+                    markBlocked(p);
                 }
+                aliveEnemies.add(new SnakeData(id, len, body.get(0), body, s.get("health").asInt()));
             }
+        }
+        
+        // Constructor for cloning
+        GameState() {}
 
-            obstacles.addAll(myBody);
+        GameState cloneState() {
+            GameState s = new GameState();
+            s.W = W; s.H = H; s.turn = turn;
+            s.myHealth = myHealth; s.myLen = myLen; s.myHead = myHead;
+            s.blocked = copyGrid(blocked, W, H);
+            s.hazards = copyGrid(hazards, W, H); // deep copy hazards? usually static but safe
+            s.isConstrictor = isConstrictor; s.isWrapped = isWrapped;
+            s.foods = new ArrayList<>(foods);
+            s.aliveEnemies = new ArrayList<>();
+            for (SnakeData e : aliveEnemies) {
+                s.aliveEnemies.add(e.cloneData());
+            }
+            return s;
+        }
+        
+        void markBlocked(Point p) {
+            if (isWrapped) p = wrap(p);
+            if (isValid(p)) blocked[p.x][p.y] = true;
         }
 
-        // Copy Constructor
-        private GameState(GameState other) {
-            this.W = other.W;
-            this.H = other.H;
-            this.turn = other.turn;
-            this.isWrapped = other.isWrapped;
-            this.myHealth = other.myHealth;
-            this.myLen = other.myLen;
-            this.myHead = other.myHead;
-            this.myBody = new ArrayList<>(other.myBody);
-            this.foods = new HashSet<>(other.foods);
-            this.enemies = other.enemies; // Shared (enemies don't move in our sim)
-            this.obstacles = new HashSet<>(other.obstacles);
-            this.hazardZones = other.hazardZones;
-        }
-
-        // Advance my snake
-        GameState advance(String moveDir) {
-            GameState next = new GameState(this);
-            Point moveVec = new Point(0, 0);
-            switch (moveDir) {
-                case "up":    moveVec = new Point(0, 1); break;
-                case "down":  moveVec = new Point(0, -1); break;
-                case "left":  moveVec = new Point(-1, 0); break;
-                case "right": moveVec = new Point(1, 0); break;
-            }
-
-            Point nextHead = myHead.add(moveVec);
+        void advanceMySnake(Point nextHead) {
             if (isWrapped) nextHead = wrap(nextHead);
-
-            next.myHead = nextHead;
-            next.myBody.add(0, nextHead);
-            next.obstacles.add(nextHead);
-            next.turn++;
-
-            if (next.foods.contains(nextHead)) {
-                next.myHealth = 100;
-                next.foods.remove(nextHead);
-                next.myLen++;
+            
+            // Check death BEFORE we move/mark
+            // If we hit a blocked cell (body/wall), we die.
+            if (!isValid(nextHead) || blocked[nextHead.x][nextHead.y]) {
+                myHealth = 0; // Mark as dead
             } else {
-                next.myHealth--;
-                if (!next.myBody.isEmpty()) {
-                    Point tail = next.myBody.remove(next.myBody.size() - 1);
-                    next.obstacles.remove(tail);
+                myHealth--;
+                if (foods.contains(nextHead)) {
+                     myLen++;
+                     myHealth = 100;
+                     foods.remove(nextHead);
                 }
             }
 
-            return next;
+            myHead = nextHead;
+            markBlocked(myHead); // Mark it now
         }
 
-        /**
-         * Legal moves: not blocked by obstacles AND not out of bounds.
-         * Hazard zones (adjacent to larger enemy heads) are EXCLUDED from legal moves
-         * but are still available via getAllMoves() as a fallback.
-         */
-        List<String> getLegalMoves() {
-            List<String> moves = new ArrayList<>();
-            for (int i = 0; i < 4; i++) {
-                Point p = myHead.add(DIRS[i]);
-                if (isWrapped) p = wrap(p);
-
-                if (isValid(p) && !isBlocked(p) && !hazardZones.contains(p)) {
-                    moves.add(DIR_NAMES[i]);
-                }
-            }
-            // If no safe moves, allow hazard zone moves (risky but better than dying)
-            if (moves.isEmpty()) {
-                for (int i = 0; i < 4; i++) {
-                    Point p = myHead.add(DIRS[i]);
-                    if (isWrapped) p = wrap(p);
-                    if (isValid(p) && !isBlocked(p)) {
-                        moves.add(DIR_NAMES[i]);
+    void advanceEnemiesPredictively() {
+            // For each enemy, pick their BEST immediate move and execute it.
+            for (SnakeData e : aliveEnemies) {
+                // Heuristic choice for enemy
+                Point bestEMove = null;
+                double bestEScore = -Double.MAX_VALUE;
+                
+                for (int[] d : DIRS) {
+                    Point en = e.head.add(d);
+                    if (isWrapped) en = wrap(en);
+                    
+                    if (!isValid(en) || blocked[en.x][en.y]) continue;
+                    
+                    // Simple enemy evaluation
+                    // 1. Distance to food (if hungry)
+                    // 2. Space available
+                    // 3. Distance to ME (Aggression)
+                    
+                    double sc = 0;
+                    sc += floodFillGrid(W, H, isWrapped, en, blocked, 20) * 10;
+                    // Anti-Collision heuristic
+                    sc += 500; 
+                    
+                    if (sc > bestEScore) {
+                        bestEScore = sc;
+                        bestEMove = en;
                     }
                 }
-            }
-            return moves;
-        }
-
-        /**
-         * Emergency: ALL valid moves ignoring obstacles too (last resort)
-         */
-        List<String> getAllMoves() {
-            List<String> moves = new ArrayList<>();
-            for (int i = 0; i < 4; i++) {
-                Point p = myHead.add(DIRS[i]);
-                if (isWrapped) p = wrap(p);
-                if (isValid(p)) {
-                    moves.add(DIR_NAMES[i]);
+                
+                if (bestEMove != null) {
+                    e.head = bestEMove;
+                    e.body.add(0, bestEMove); // Update body reference
+                    markBlocked(bestEMove);
+                } else {
+                    // Enemy dies (trapped)
                 }
             }
-            return moves;
         }
 
-        boolean isGameOver() {
-            // Only check health — myHead is always in obstacles after advance()
+        boolean amIDead() {
             return myHealth <= 0;
+        }
+        
+        boolean hasWon() {
+             return aliveEnemies.isEmpty();
         }
 
         boolean isValid(Point p) {
@@ -454,21 +480,22 @@ public class Snake {
         }
 
         boolean isBlocked(Point p) {
-            return obstacles.contains(p);
+            Point c = isWrapped ? wrap(p) : p;
+            if (!isValid(c)) return true;
+            return blocked[c.x][c.y];
         }
 
         Point wrap(Point p) {
             return new Point((p.x % W + W) % W, (p.y % H + H) % H);
         }
-
+        
         int dist(Point a, Point b) {
-            int dx = Math.abs(a.x - b.x);
-            int dy = Math.abs(a.y - b.y);
-            if (isWrapped) {
-                dx = Math.min(dx, W - dx);
-                dy = Math.min(dy, H - dy);
-            }
-            return dx + dy;
+            return manhattan(a, b, W, H, isWrapped);
+        }
+
+        int bfsDist(Point start, Point target) {
+             // simplified dist for perf
+             return manhattan(start, target, W, H, isWrapped);
         }
     }
 
@@ -476,15 +503,27 @@ public class Snake {
         int x, y;
         public Point(int x, int y) { this.x = x; this.y = y; }
         public Point add(int[] d) { return new Point(x + d[0], y + d[1]); }
-        public Point add(Point p) { return new Point(x + p.x, y + p.y); }
-        @Override
-        public boolean equals(Object o) {
+        @Override public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof Point)) return false;
             Point p = (Point) o;
             return x == p.x && y == p.y;
         }
         @Override public int hashCode() { return Objects.hash(x, y); }
-        @Override public String toString() { return "(" + x + "," + y + ")"; }
+    }
+
+    static class SnakeData {
+        String id;
+        int len;
+        Point head;
+        List<Point> body;
+        int health;
+        SnakeData(String id, int len, Point head, List<Point> body, int health) {
+            this.id = id; this.len = len; this.head = head;
+            this.body = new ArrayList<>(body); this.health = health;
+        }
+        SnakeData cloneData() {
+             return new SnakeData(id, len, head, body, health);
+        }
     }
 }
