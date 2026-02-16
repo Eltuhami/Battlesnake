@@ -174,7 +174,8 @@ public class Snake {
 
     private static double evaluate(GameState state) {
         if (state.myHealth <= 0) return -1_000_000;
-        if (state.isBlocked(state.myHead)) return -1_000_000;
+        // Note: do NOT check isBlocked(myHead) here — myHead is in obstacles
+        // after advance() for future collision detection, but it's our valid position.
 
         double score = 0;
 
@@ -443,7 +444,8 @@ public class Snake {
         }
 
         boolean isGameOver() {
-            return myHealth <= 0 || isBlocked(myHead);
+            // Only check health — myHead is always in obstacles after advance()
+            return myHealth <= 0;
         }
 
         boolean isValid(Point p) {
