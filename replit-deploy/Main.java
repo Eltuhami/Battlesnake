@@ -8,388 +8,373 @@ import java.util.*;
 import static spark.Spark.*;
 
 /**
- * GODMODE SNAKE v16.0 - DOMINANT PREDATOR
- * Optimized for Replit deployment
+ * INTELLIGENT SNAKE v1.1 - MINIMAX (Replit Version)
+ * - Improved fallback logic
+ * - Detailed logging
  */
 public class Main {
     private static final ObjectMapper JSON = new ObjectMapper();
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-    private static final int[][] DIRS = {{0,1},{0,-1},{-1,0},{1,0}};
+
+    private static final int[][] DIRS = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}};
     private static final String[] DIR_NAMES = {"up", "down", "left", "right"};
 
+    // --- MINIMAX SETTINGS ---
+    private static final int MAX_DEPTH_LIMIT = 12; 
+    private static final long TIME_LIMIT_MS = 300; 
+
+    // --- SCORING WEIGHTS ---
+    private static final double W_SPACE      = 10.0;
+    private static final double W_FOOD       = 25.0; 
+    private static final double W_HEALTH     = 2.0;
+
     public static void main(String[] args) {
-        // Replit uses PORT environment variable
         String portStr = System.getenv("PORT");
         if (portStr == null) portStr = "8080";
-        int portNum = Integer.parseInt(portStr);
+        port(Integer.parseInt(portStr));
         
-        port(portNum);
-        get("/", (req, res) -> {
-            res.type("application/json");
-            return JSON.writeValueAsString(index());
-        });
-        post("/start", (req, res) -> {
-            res.type("application/json");
-            return "{}";
-        });
-        post("/move", (req, res) -> {
-            res.type("application/json");
-            return JSON.writeValueAsString(move(JSON.readTree(req.body())));
-        });
-        post("/end", (req, res) -> {
-            res.type("application/json");
-            return "{}";
-        });
-        
-        System.out.println("GODMODE Snake running on port " + portNum);
+        get("/", (req, res) -> JSON.writeValueAsString(index()));
+        post("/start", (req, res) -> "{}");
+        post("/move", (req, res) -> JSON.writeValueAsString(move(JSON.readTree(req.body()))));
+        post("/end", (req, res) -> "{}");
     }
 
     static Map<String, String> index() {
         Map<String, String> r = new HashMap<>();
         r.put("apiversion", "1");
-        r.put("author", "GODMODE");
-        r.put("color", "#FF0000");
-        r.put("head", "evil");
-        r.put("tail", "sharp");
+        r.put("author", "AntiGravity-Intel");
+        r.put("color", "#00AAFF"); 
+        r.put("head", "smart-caterpillar"); 
+        r.put("tail", "curled");
         return r;
     }
 
-    static Map<String, String> move(JsonNode r) {
-        int W = r.get("board").get("width").asInt();
-        int H = r.get("board").get("height").asInt();
-        int turn = r.get("turn").asInt();
-        JsonNode you = r.get("you");
-        int hp = you.get("health").asInt();
-        int len = you.get("body").size();
-        String myId = you.get("id").asText();
-        int hx = you.get("head").get("x").asInt();
-        int hy = you.get("head").get("y").asInt();
-        JsonNode myBody = you.get("body");
-        int tailX = myBody.get(len - 1).get("x").asInt();
-        int tailY = myBody.get(len - 1).get("y").asInt();
+    static Map<String, String> move(JsonNode root) {
+        long startTime = System.currentTimeMillis();
+        GameState state = new GameState(root);
         
-        String gameMode = "standard";
-        int hazardDamage = 15;
-        JsonNode game = r.get("game");
-        if (game != null) {
-            JsonNode ruleset = game.get("ruleset");
-            if (ruleset != null) {
-                JsonNode n = ruleset.get("name");
-                if (n != null) gameMode = n.asText().toLowerCase();
-                JsonNode s = ruleset.get("settings");
-                if (s != null) {
-                    JsonNode h = s.get("hazardDamagePerTurn");
-                    if (h != null) hazardDamage = h.asInt();
+        String bestMove = getBestMove(state, startTime);
+
+        Map<String, String> res = new HashMap<>();
+        res.put("move", bestMove);
+        return res;
+    }
+
+    // ============================================================
+    // MINIMAX ENGINE
+    // ============================================================
+
+    private static String getBestMove(GameState rootState, long startTime) {
+        List<String> moves = rootState.getLegalMoves();
+        if (moves.isEmpty()) {
+            LOG.warn("No legal moves at root!");
+            return "up"; 
+        }
+
+        // Safety Fallback: Pick ANY safe move to ensure we don't return default "up" into a wall
+        String bestMove = moves.get(new Random().nextInt(moves.size()));
+        double bestScore = -Double.MAX_VALUE;
+        
+        // Iterative Deepening
+        for (int depth = 1; depth <= MAX_DEPTH_LIMIT; depth++) {
+            if (System.currentTimeMillis() - startTime > TIME_LIMIT_MS) {
+                LOG.info("Time limit reached at start of depth {}", depth);
+                break;
+            }
+
+            String currentBestMove = bestMove;
+            double currentBestScore = -Double.MAX_VALUE;
+            boolean validSearch = true;
+            StringBuilder logMsg = new StringBuilder("D").append(depth).append(": ");
+
+            for (String move : moves) {
+                GameState next = rootState.advance(move);
+                double score = minimax(next, depth - 1, -Double.MAX_VALUE, Double.MAX_VALUE, false, startTime);
+                
+                logMsg.append(move).append("=").append((int)score).append(" ");
+                
+                if (score > currentBestScore) {
+                    currentBestScore = score;
+                    currentBestMove = move;
+                }
+                
+                if (System.currentTimeMillis() - startTime > TIME_LIMIT_MS) {
+                    validSearch = false; 
+                    break;
                 }
             }
-        }
-        
-        boolean isMaze = gameMode.contains("maze");
-        boolean isRoyale = gameMode.contains("royale");
-        boolean isWrapped = gameMode.contains("wrapped");
-        
-        boolean[][] blocked = new boolean[W][H];
-        boolean[][] hazard = new boolean[W][H];
-        List<int[]> enemies = new ArrayList<>();
-        List<int[]> smallerEnemies = new ArrayList<>();
-        List<int[]> biggerEnemies = new ArrayList<>();
-        int maxEnemyLen = 0;
-        int aliveEnemies = 0;
-        
-        for (JsonNode snake : r.get("board").get("snakes")) {
-            JsonNode bodyArr = snake.get("body");
-            int sLen = bodyArr.size();
-            int sHp = snake.get("health").asInt();
-            boolean isMe = snake.get("id").asText().equals(myId);
-            
-            if (!isMe) {
-                aliveEnemies++;
-                int ex = snake.get("head").get("x").asInt();
-                int ey = snake.get("head").get("y").asInt();
-                enemies.add(new int[]{ex, ey, sLen, sHp});
-                if (sLen > maxEnemyLen) maxEnemyLen = sLen;
-                if (sLen < len) smallerEnemies.add(new int[]{ex, ey, sLen, sHp});
-                else biggerEnemies.add(new int[]{ex, ey, sLen, sHp});
-            }
-            
-            int startIdx = isMe ? 1 : 0;
-            for (int j = startIdx; j < sLen - 1; j++) {
-                int bx = bodyArr.get(j).get("x").asInt();
-                int by = bodyArr.get(j).get("y").asInt();
-                if (valid(bx, by, W, H)) blocked[bx][by] = true;
-            }
-            
-            if (sLen >= 2) {
-                int t1x = bodyArr.get(sLen-1).get("x").asInt(), t1y = bodyArr.get(sLen-1).get("y").asInt();
-                int t2x = bodyArr.get(sLen-2).get("x").asInt(), t2y = bodyArr.get(sLen-2).get("y").asInt();
-                if (t1x == t2x && t1y == t2y && valid(t1x, t1y, W, H)) blocked[t1x][t1y] = true;
+
+            if (validSearch) {
+                bestMove = currentBestMove;
+                bestScore = currentBestScore;
+                LOG.info("{} -> Best: {}", logMsg, bestMove);
+            } else {
+                LOG.info("Depth {} aborted due to timeout.", depth);
+                break; 
             }
         }
         
-        JsonNode hazards = r.get("board").get("hazards");
-        if (hazards != null) {
-            for (JsonNode h : hazards) {
-                int hzx = h.get("x").asInt(), hzy = h.get("y").asInt();
-                if (valid(hzx, hzy, W, H)) { 
-                    hazard[hzx][hzy] = true;
-                    if (isMaze || hazardDamage >= 100) blocked[hzx][hzy] = true;
-                }
+        return bestMove;
+    }
+
+    private static double minimax(GameState state, int depth, double alpha, double beta, boolean maximizingPlayer, long startTime) {
+        if (System.currentTimeMillis() - startTime > TIME_LIMIT_MS) return 0; 
+        
+        if (depth == 0 || state.isGameOver()) {
+            return evaluate(state);
+        }
+
+        if (maximizingPlayer) {
+            double maxEval = -Double.MAX_VALUE;
+            List<String> moves = state.getLegalMoves();
+            if (moves.isEmpty()) return -1_000_000; 
+
+            for (String move : moves) {
+                GameState next = state.advance(move);
+                double eval = minimax(next, depth - 1, alpha, beta, false, startTime);
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, eval);
+                if (beta <= alpha) break;
             }
+            return maxEval;
+        } else {
+            return minimax(state, depth, alpha, beta, true, startTime); 
         }
-        boolean inHazard = hazard[hx][hy];
-        
-        List<int[]> foods = new ArrayList<>();
-        for (JsonNode f : r.get("board").get("food")) {
-            int fx = f.get("x").asInt(), fy = f.get("y").asInt();
-            foods.add(new int[]{fx, fy, Math.abs(hx-fx) + Math.abs(hy-fy)});
+    }
+
+    // ============================================================
+    // EVALUATION
+    // ============================================================
+
+    private static double evaluate(GameState state) {
+        if (state.myHealth <= 0) return -1_000_000; 
+        if (state.isBlocked(state.myHead)) return -1_000_000;
+
+        double score = 0;
+
+        // 1. Flood Fill
+        int space = floodFill(state, state.myHead, state.myLen * 3);
+        if (space < state.myLen) {
+            return -500_000 + (space * 100); 
         }
-        foods.sort((a, b) -> a[2] - b[2]);
-        
-        boolean earlyGame = turn < 30;
-        boolean lateGame = turn >= 100 || aliveEnemies <= 2;
-        boolean endGame = aliveEnemies <= 1;
-        boolean desperate = hp < 15;
-        boolean critical = hp < 30;
-        boolean hungry = hp < 60 || len <= maxEnemyLen;
-        boolean largest = len > maxEnemyLen;
-        boolean dominant = len > maxEnemyLen + 2;
-        boolean beingHunted = !biggerEnemies.isEmpty();
-        
-        int myTerritory = flood(hx, hy, W, H, blocked, hazard, hp > 40 && !isMaze, isMaze);
-        
-        List<int[]> safeMoves = new ArrayList<>();
-        List<int[]> riskyMoves = new ArrayList<>();
-        List<int[]> desperateMoves = new ArrayList<>();
-        
-        for (int i = 0; i < 4; i++) {
-            int nx = hx + DIRS[i][0], ny = hy + DIRS[i][1];
-            if (isWrapped) { nx = (nx + W) % W; ny = (ny + H) % H; }
-            if (!valid(nx, ny, W, H)) continue;
-            
-            desperateMoves.add(new int[]{i, nx, ny});
-            if (blocked[nx][ny]) continue;
-            
-            if (hazard[nx][ny] && !isMaze) riskyMoves.add(new int[]{i, nx, ny});
-            else safeMoves.add(new int[]{i, nx, ny});
+        score += space * W_SPACE;
+
+        // 2. Food
+        double foodUrgency = (state.myHealth < 40) ? 5.0 : 1.0;
+        int distToFood = getClosestFoodDist(state);
+        if (distToFood != Integer.MAX_VALUE) {
+            score += (500.0 / (distToFood + 1)) * foodUrgency * W_FOOD;
         }
+
+        // 3. Health
+        score += state.myHealth * W_HEALTH;
         
-        List<int[]> moves;
-        String tier;
-        if (!safeMoves.isEmpty()) { moves = safeMoves; tier = "S"; }
-        else if (!riskyMoves.isEmpty()) { moves = riskyMoves; tier = "R"; }
-        else if (!desperateMoves.isEmpty()) { moves = desperateMoves; tier = "D"; }
-        else {
-            Map<String, String> res = new HashMap<>();
-            res.put("move", "up");
-            return res;
+        // 4. Center Control
+        int distCenter = Math.abs(state.myHead.x - state.W/2) + Math.abs(state.myHead.y - state.H/2);
+        score -= distCenter * 2;
+        
+        // 5. Length dominance
+        for(List<Point> enemy : state.enemies) {
+            if (state.myLen > enemy.size()) score += 1000;
+            else if (state.myLen < enemy.size()) score -= 500;
         }
+
+        return score;
+    }
+    
+    // ============================================================
+    // UTILS
+    // ============================================================
+
+    static int floodFill(GameState state, Point start, int max) {
+        boolean[][] visited = new boolean[state.W][state.H];
+        for(Point p : state.obstacles) {
+            if (state.isValid(p)) visited[p.x][p.y] = true;
+        }
+        if (state.isValid(start)) visited[start.x][start.y] = true; 
+
+        Queue<Point> q = new LinkedList<>();
+        q.add(start);
         
-        String bestMove = null;
-        int bestScore = Integer.MIN_VALUE;
-        
-        for (int[] m : moves) {
-            int i = m[0], nx = m[1], ny = m[2];
-            int score = 0;
+        int count = 0;
+        while(!q.isEmpty()) {
+            Point p = q.poll();
+            count++;
+            if (count >= max) return count;
             
-            if (tier.equals("D")) score -= 500000;
-            if (tier.equals("R")) score -= 20000;
-            
-            int space = flood(nx, ny, W, H, blocked, hazard, hp > 40 && !isMaze, isMaze);
-            if (space < len) score -= 999999;
-            else if (space < len + 3) score -= 150000;
-            else if (space < len * 2) score -= 50000;
-            else score += space * 25;
-            
-            int escapes = 0;
             for (int[] d : DIRS) {
-                int ex = nx + d[0], ey = ny + d[1];
-                if (isWrapped) { ex = (ex + W) % W; ey = (ey + H) % H; }
-                if (valid(ex, ey, W, H) && !blocked[ex][ey]) escapes++;
-            }
-            if (escapes == 0) score -= 100000;
-            else if (escapes == 1) score -= 40000;
-            else score += escapes * 4000;
-            
-            if (hazard[nx][ny] && !isMaze) {
-                int hpAfter = hp - hazardDamage;
-                if (hpAfter <= 0) score -= 999999;
-                else if (hp > 70) score -= 60000;
-                else if (hp > 50) score -= 40000;
-                else score -= 15000;
-                for (int[] f : foods) {
-                    if (f[0] == nx && f[1] == ny) score += 55000;
-                }
-            }
-            if (inHazard && !hazard[nx][ny]) score += 80000;
-            
-            for (int[] en : biggerEnemies) {
-                int dist = Math.abs(nx - en[0]) + Math.abs(ny - en[1]);
-                if (dist == 1) score -= 120000;
-                else if (dist == 2) score -= 20000;
-                else if (dist <= 4) score -= 5000;
-            }
-            for (int[] en : smallerEnemies) {
-                int dist = Math.abs(nx - en[0]) + Math.abs(ny - en[1]);
-                if (dist == 1) {
-                    int killBonus = 60000;
-                    if (endGame) killBonus += 50000;
-                    if (en[3] < 25) killBonus += 20000;
-                    score += killBonus;
-                } else if (dist == 2 && dominant) {
-                    score += 15000;
-                }
-            }
-            
-            if (desperate || critical || hungry || earlyGame) {
-                if (!foods.isEmpty()) {
-                    int[] closest = foods.get(0);
-                    int dist = Math.abs(nx - closest[0]) + Math.abs(ny - closest[1]);
-                    int urgency;
-                    if (desperate) urgency = 2000;
-                    else if (critical) urgency = 1000;
-                    else if (earlyGame) urgency = 800;
-                    else if (hungry) urgency = 500;
-                    else urgency = 200;
-                    score += (35 - dist) * urgency;
-                    if (nx == closest[0] && ny == closest[1]) score += urgency * 5;
-                }
-            }
-            
-            int tailDist = Math.abs(nx - tailX) + Math.abs(ny - tailY);
-            score += (25 - tailDist) * 200;
-            
-            int threats = 0;
-            for (int[] d : DIRS) {
-                int cx = nx + d[0], cy = ny + d[1];
-                for (int[] en : biggerEnemies) {
-                    if (Math.abs(cx - en[0]) + Math.abs(cy - en[1]) <= 1) {
-                        threats++; break;
+                Point next = p.add(d);
+                if (state.isWrapped) next = state.wrap(next);
+                
+                if (state.isValid(next) && !visited[next.x][next.y]) {
+                    if (!state.hazardZones.contains(next)) {
+                        visited[next.x][next.y] = true;
+                        q.add(next);
                     }
                 }
             }
-            if (threats >= 2) score -= 30000;
-            
-            int centerDist = Math.abs(nx - W/2) + Math.abs(ny - H/2);
-            score += (W + H - centerDist) * (isRoyale ? 30 : 15);
-            
-            if (dominant && !smallerEnemies.isEmpty()) {
-                blocked[nx][ny] = true;
-                for (int[] en : smallerEnemies) {
-                    int enSpace = flood(en[0], en[1], W, H, blocked, hazard, false, isMaze);
-                    if (enSpace < en[2]) score += endGame ? 120000 : 70000;
-                    else if (enSpace < en[2] * 2) score += 25000;
-                }
-                blocked[nx][ny] = false;
-            }
-            
-            if (dominant && !smallerEnemies.isEmpty()) {
-                for (int[] en : smallerEnemies) {
-                    int dist = Math.abs(nx - en[0]) + Math.abs(ny - en[1]);
-                    score += (40 - dist) * (endGame ? 1000 : 500);
-                }
-            }
-            
-            for (int[] en : smallerEnemies) {
-                int enEdge = Math.min(Math.min(en[0], W-1-en[0]), Math.min(en[1], H-1-en[1]));
-                if (enEdge <= 2) {
-                    int myDist = Math.abs(nx - en[0]) + Math.abs(ny - en[1]);
-                    if (myDist <= 5) score += 15000;
-                }
-            }
-            
-            if (largest && myTerritory > 0) {
-                for (int[] en : enemies) {
-                    blocked[nx][ny] = true;
-                    int theirSpace = flood(en[0], en[1], W, H, blocked, hazard, false, isMaze);
-                    blocked[nx][ny] = false;
-                    if (theirSpace < myTerritory / 2) score += 20000;
-                }
-            }
-            
-            if (beingHunted) {
-                int minBiggerDist = 999;
-                for (int[] en : biggerEnemies) {
-                    int dist = Math.abs(nx - en[0]) + Math.abs(ny - en[1]);
-                    if (dist < minBiggerDist) minBiggerDist = dist;
-                }
-                score += minBiggerDist * 10000;
-            }
-            
-            if (isRoyale && !hazard[nx][ny]) {
-                int ring = Math.min(turn / 20, Math.min(W, H) / 2 - 1);
-                int edge = Math.min(Math.min(nx, W-1-nx), Math.min(ny, H-1-ny));
-                if (edge <= ring + 1) score -= 15000;
-                else score += edge * 400;
-            }
-            
-            if (score > -100000) {
-                score += lookahead(nx, ny, W, H, blocked, hazard, enemies, len, hp, isMaze, isWrapped) / 3;
-            }
-            
-            if (score > bestScore) {
-                bestScore = score;
-                bestMove = DIR_NAMES[i];
-            }
         }
-        
-        if (bestMove == null && !moves.isEmpty()) bestMove = DIR_NAMES[moves.get(0)[0]];
-        if (bestMove == null) bestMove = "up";
-        
-        String status = dominant ? "D" : (largest ? "L" : (beingHunted ? "H" : "-"));
-        LOG.info("T{} HP:{} L:{} {}[{}]:{} -> {} ({})", turn, hp, len, tier, status, myTerritory, bestMove, bestScore);
-        
-        Map<String, String> result = new HashMap<>();
-        result.put("move", bestMove);
-        return result;
+        return count;
     }
     
-    static int lookahead(int x, int y, int W, int H, boolean[][] blocked, boolean[][] hazard,
-            List<int[]> enemies, int len, int hp, boolean isMaze, boolean isWrapped) {
-        int best = Integer.MIN_VALUE;
-        boolean[][] nb = new boolean[W][H];
-        for (int i = 0; i < W; i++) System.arraycopy(blocked[i], 0, nb[i], 0, H);
-        nb[x][y] = true;
-        
-        for (int[] d : DIRS) {
-            int nx = x + d[0], ny = y + d[1];
-            if (isWrapped) { nx = (nx + W) % W; ny = (ny + H) % H; }
-            if (!valid(nx, ny, W, H) || nb[nx][ny]) continue;
-            
-            int s = 0;
-            int space = flood(nx, ny, W, H, nb, hazard, hp > 50 && !isMaze, isMaze);
-            if (space < len) s -= 80000;
-            else s += space * 12;
-            if (!isMaze && hazard[nx][ny]) s -= 15000;
-            for (int[] en : enemies) {
-                int dist = Math.abs(nx - en[0]) + Math.abs(ny - en[1]);
-                if (dist <= 1 && en[2] >= len) s -= 40000;
-            }
-            if (s > best) best = s;
+    static int getClosestFoodDist(GameState state) {
+        int min = Integer.MAX_VALUE;
+        for (Point f : state.foods) {
+            int d = state.dist(state.myHead, f);
+            if (d < min) min = d;
         }
-        return best == Integer.MIN_VALUE ? -20000 : best;
+        return min;
     }
-    
-    static boolean valid(int x, int y, int W, int H) { return x >= 0 && x < W && y >= 0 && y < H; }
-    
-    static int flood(int sx, int sy, int W, int H, boolean[][] blocked, boolean[][] hazard, boolean avoidHaz, boolean isMaze) {
-        if (!valid(sx, sy, W, H) || blocked[sx][sy]) return 0;
-        if (!isMaze && avoidHaz && hazard[sx][sy]) return 0;
+
+    // ============================================================
+    // GAME STATE
+    // ============================================================
+
+    static class GameState {
+        int W, H;
+        int myHealth, myLen;
+        Point myHead;
+        List<Point> myBody;
+        Set<Point> foods = new HashSet<>();
+        List<List<Point>> enemies = new ArrayList<>(); 
         
-        boolean[][] seen = new boolean[W][H];
-        int[] qx = new int[W*H], qy = new int[W*H];
-        int h = 0, t = 0;
-        qx[t] = sx; qy[t++] = sy; seen[sx][sy] = true;
-        int c = 0;
-        while (h < t && c < 500) {
-            int x = qx[h], y = qy[h++]; c++;
-            for (int[] d : DIRS) {
-                int nx = x+d[0], ny = y+d[1];
-                if (valid(nx,ny,W,H) && !seen[nx][ny] && !blocked[nx][ny]) {
-                    if (!isMaze && avoidHaz && hazard[nx][ny]) continue;
-                    seen[nx][ny] = true; qx[t] = nx; qy[t++] = ny;
+        Set<Point> hazardZones = new HashSet<>(); 
+        Set<Point> obstacles = new HashSet<>();   
+        
+        boolean isWrapped, isConstrictor;
+        
+        GameState(JsonNode root) {
+            JsonNode board = root.get("board");
+            W = board.get("width").asInt(); 
+            H = board.get("height").asInt();
+            JsonNode rules = root.get("game").get("ruleset");
+            isWrapped = rules.has("name") && rules.get("name").asText().contains("wrapped");
+
+            JsonNode you = root.get("you");
+            myHealth = you.get("health").asInt();
+            myBody = new ArrayList<>();
+            for (JsonNode b : you.get("body")) myBody.add(new Point(b.get("x").asInt(), b.get("y").asInt()));
+            myHead = myBody.get(0);
+            myLen = myBody.size();
+
+            for (JsonNode f : board.get("food")) foods.add(new Point(f.get("x").asInt(), f.get("y").asInt()));
+
+            for (JsonNode s : board.get("snakes")) {
+                if (s.get("id").asText().equals(you.get("id").asText())) continue;
+                List<Point> enemyBody = new ArrayList<>();
+                for (JsonNode b : s.get("body")) enemyBody.add(new Point(b.get("x").asInt(), b.get("y").asInt()));
+                enemies.add(enemyBody);
+                obstacles.addAll(enemyBody);
+                
+                Point eHead = enemyBody.get(0);
+                if (enemyBody.size() >= myLen) {
+                    for(int[] d : DIRS) {
+                        Point next = eHead.add(d);
+                        if(isWrapped) next = wrap(next);
+                        hazardZones.add(next);
+                    }
                 }
             }
+            
+            obstacles.addAll(myBody);
+            // Ignore tail removal at ROOT
         }
-        return c;
+        
+        private GameState(GameState other) {
+            this.W = other.W; this.H = other.H;
+            this.isWrapped = other.isWrapped;
+            this.myHealth = other.myHealth;
+            this.myLen = other.myLen;
+            this.myHead = other.myHead; 
+            this.myBody = new ArrayList<>(other.myBody);
+            this.foods = new HashSet<>(other.foods);
+            this.enemies = other.enemies; 
+            this.obstacles = new HashSet<>(other.obstacles);
+            this.hazardZones = other.hazardZones; 
+        }
+
+        GameState advance(String moveDir) {
+            GameState next = new GameState(this);
+            Point moveVec = new Point(0,0);
+            if (moveDir.equals("up")) moveVec = new Point(0, 1);
+            else if (moveDir.equals("down")) moveVec = new Point(0, -1);
+            else if (moveDir.equals("left")) moveVec = new Point(-1, 0);
+            else if (moveDir.equals("right")) moveVec = new Point(1, 0);
+            
+            Point nextHead = myHead.add(moveVec);
+            if (isWrapped) nextHead = wrap(nextHead);
+            
+            next.myHead = nextHead;
+            next.myBody.add(0, nextHead);
+            next.obstacles.add(nextHead); 
+            
+            if (next.foods.contains(nextHead)) {
+                next.myHealth = 100;
+                next.foods.remove(nextHead);
+                next.myLen++;
+            } else {
+                next.myHealth--;
+                if (!next.myBody.isEmpty()) {
+                    Point tail = next.myBody.remove(next.myBody.size() - 1);
+                    next.obstacles.remove(tail); 
+                }
+            }
+            return next;
+        }
+
+        List<String> getLegalMoves() {
+            List<String> moves = new ArrayList<>();
+            for (int i=0; i<4; i++) {
+                Point p = myHead.add(DIRS[i]);
+                if (isWrapped) p = wrap(p);
+                
+                if (isValid(p) && !isBlocked(p)) {
+                   moves.add(DIR_NAMES[i]);
+                }
+            }
+            return moves;
+        }
+        
+        boolean isGameOver() {
+            return myHealth <= 0 || isBlocked(myHead); 
+        }
+
+        boolean isValid(Point p) {
+            if (isWrapped) return true;
+            return p.x >= 0 && p.x < W && p.y >= 0 && p.y < H;
+        }
+
+        boolean isBlocked(Point p) {
+            return obstacles.contains(p);
+        }
+
+        Point wrap(Point p) {
+            return new Point((p.x % W + W) % W, (p.y % H + H) % H);
+        }
+        
+        int dist(Point a, Point b) {
+            int dx = Math.abs(a.x - b.x);
+            int dy = Math.abs(a.y - b.y);
+            if (isWrapped) {
+                dx = Math.min(dx, W - dx);
+                dy = Math.min(dy, H - dy);
+            }
+            return dx + dy;
+        }
+    }
+
+    static class Point {
+        int x, y;
+        public Point(int x, int y) { this.x = x; this.y = y; }
+        public Point add(int[] d) { return new Point(x + d[0], y + d[1]); }
+        public Point add(Point p) { return new Point(x + p.x, y + p.y); }
+        @Override public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Point)) return false;
+            Point p = (Point) o;
+            return x == p.x && y == p.y;
+        }
+        @Override public int hashCode() { return Objects.hash(x, y); }
+        @Override public String toString() { return "(" + x + "," + y + ")"; }
     }
 }
