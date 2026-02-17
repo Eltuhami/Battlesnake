@@ -172,6 +172,10 @@ public class Snake {
     // EVALUATE
     // ============================================================
 
+    // ============================================================
+    // EVALUATE
+    // ============================================================
+
     private static double evaluate(GameState state, Point myHead) {
         // CONSTRICTOR OVERRIDE
         if (state.isConstrictor) {
@@ -180,19 +184,10 @@ public class Snake {
 
         double score = 0;
 
-        // 1. VORONOI TERRITORY (replacing simple flood fill)
-        // This calculates how many cells I can reach BEFORE any enemy.
-        // It prevents us from getting squeezed into large but dead-end pockets.
-        int safeSpace = bfsVoronoi(state, myHead);
-        
-        // Survival Critical Check
-        if (safeSpace < state.myLen) {
-             // We are trapped in a space smaller than our body.
-             // This is likely death unless we can chase our tail (which Voronoi doesn't perfectly capture, but is a good proxy).
-             return SCORE_CERTAIN_DEATH + safeSpace * 1000;
-        }
-        
-        score += safeSpace * W_SPACE;
+        // 1. SPACE (Freedom) - Reverted to Flood Fill for stability
+        int space = floodFillGrid(state.W, state.H, state.isWrapped, myHead, state.blocked, state.myLen * 3);
+        if (space < state.myLen) return SCORE_CERTAIN_DEATH + space * 1000;
+        score += space * W_SPACE;
 
         // 2. FOOD
         score += foodScore(state, myHead);
@@ -221,8 +216,8 @@ public class Snake {
          
          double score = 0;
          
-         // Use Voronoi here too? Yes, absolutely critical in constrictor.
-         int space = bfsVoronoi(state, myHead);
+         // Use Flood Fill heavily
+         int space = floodFillGrid(state.W, state.H, state.isWrapped, myHead, state.blocked, 1000);
          score += space * 100.0;
          
          // If space is tight, Panic
@@ -243,68 +238,6 @@ public class Snake {
     // SCORING HELPERS
     // ============================================================
     
-    // Multi-Source BFS to count "Guaranteed Space"
-    static int bfsVoronoi(GameState state, Point myHead) {
-        int[][] dist = new int[state.W][state.H];
-        for(int[] r : dist) Arrays.fill(r, -1);
-        
-        // 0 = Me, 1 = Enemy
-        int[][] owners = new int[state.W][state.H];
-        
-        Queue<Point> q = new LinkedList<>();
-        
-        // 1. Add Enemies to Queue FIRST (Pessimistic: Ties go to enemy)
-        for (SnakeData e : state.aliveEnemies) {
-            if (state.isValid(e.head)) {
-                dist[e.head.x][e.head.y] = 0;
-                owners[e.head.x][e.head.y] = 1;
-                q.add(e.head);
-            }
-        }
-        
-        // 2. Add Me
-        // Note: myHead is likely marked 'blocked' in blocked[][] by GameState init,
-        // but we are "on" it now. In this specific BFS, we want to expand FROM it.
-        // We must check if 'dist' is -1 to ensure we didn't collide with enemy head (head-to-head handled elsewhere, this is space).
-        if (state.isValid(myHead) && dist[myHead.x][myHead.y] == -1) {
-             dist[myHead.x][myHead.y] = 0;
-             owners[myHead.x][myHead.y] = 0;
-             q.add(myHead);
-        }
-        
-        int myCount = 0;
-        
-        while(!q.isEmpty()) {
-            Point p = q.poll();
-            int d = dist[p.x][p.y];
-            int owner = owners[p.x][p.y];
-            
-            if (owner == 0) myCount++;
-            
-            // Optimization: If space is HUGE, we stop.
-            if (myCount > state.myLen * 2 && myCount > 100) return myCount; 
-            
-            for (int[] dir : DIRS) {
-                 Point n = p.add(dir);
-                 if (state.isWrapped) n = state.wrap(n);
-                 
-                 if (!state.isValid(n)) continue;
-                 
-                 // Key: We cannot walk through blocked cells.
-                 // EXCEPTION: We can "chase" tail? 
-                 // For Voronoi (General Space), treating bodies as walls is correct.
-                 if (state.blocked[n.x][n.y]) continue; 
-                 
-                 if (dist[n.x][n.y] == -1) {
-                     dist[n.x][n.y] = d + 1;
-                     owners[n.x][n.y] = owner;
-                     q.add(n);
-                 }
-            }
-        }
-        return myCount;
-    }
-
     // Strategy weights (V23 Standard)
     private static final double W_SPACE      = 10.0;
     private static final double W_AGGRESSION = 50.0;
