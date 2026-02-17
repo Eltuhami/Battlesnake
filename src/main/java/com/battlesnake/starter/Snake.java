@@ -204,10 +204,10 @@ public class Snake {
 
         double score = 0;
 
-        // 1. SPACE (Freedom) - increased cap for better awareness
-        int space = floodFillGrid(state.W, state.H, state.isWrapped, myHead, state.blocked, state.W * state.H);
-        if (space < state.myLen) return SCORE_CERTAIN_DEATH + space * 1000;
-        score += space * W_SPACE;
+        // 1. VORONOI TERRITORY - counts cells we can reach BEFORE any enemy
+        int safeSpace = bfsVoronoi(state, myHead);
+        if (safeSpace < state.myLen) return SCORE_CERTAIN_DEATH + safeSpace * 1000;
+        score += safeSpace * W_SPACE;
 
         // 1b. EDGE PENALTY - avoid walls when enemies are alive
         if (!state.aliveEnemies.isEmpty()) {
@@ -363,6 +363,76 @@ public class Snake {
         int dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y);
         if (wrapped) { dx = Math.min(dx, W - dx); dy = Math.min(dy, H - dy); }
         return dx + dy;
+    }
+
+    // Multi-source BFS Voronoi: counts cells "guaranteed" reachable by us before any enemy.
+    // Enemies are seeded FIRST (pessimistic: ties go to enemy).
+    static int bfsVoronoi(GameState state, Point myHead) {
+        int W = state.W;
+        int H = state.H;
+        int[][] dist = new int[W][H];
+        for (int[] row : dist) Arrays.fill(row, -1);
+        int[][] owner = new int[W][H]; // 0=me, 1=enemy
+
+        Queue<int[]> q = new LinkedList<>();
+
+        // Seed enemies first (pessimistic)
+        for (SnakeData e : state.aliveEnemies) {
+            Point eh = e.head;
+            if (state.isWrapped) eh = state.wrap(eh);
+            if (state.isValid(eh) && eh.x >= 0 && eh.x < W && eh.y >= 0 && eh.y < H) {
+                if (dist[eh.x][eh.y] == -1) {
+                    dist[eh.x][eh.y] = 0;
+                    owner[eh.x][eh.y] = 1;
+                    q.add(new int[]{eh.x, eh.y});
+                }
+            }
+        }
+
+        // Seed me
+        int mx = myHead.x;
+        int my = myHead.y;
+        if (state.isWrapped) {
+            mx = (mx % W + W) % W;
+            my = (my % H + H) % H;
+        }
+        if (mx >= 0 && mx < W && my >= 0 && my < H && dist[mx][my] == -1) {
+            dist[mx][my] = 0;
+            owner[mx][my] = 0;
+            q.add(new int[]{mx, my});
+        }
+
+        int myCount = 0;
+
+        while (!q.isEmpty()) {
+            int[] cur = q.poll();
+            int cx = cur[0];
+            int cy = cur[1];
+            int d = dist[cx][cy];
+            int o = owner[cx][cy];
+
+            if (o == 0) myCount++;
+
+            // Early exit: if we have lots of space, stop counting
+            if (myCount > state.myLen * 2 && myCount > 50) return myCount;
+
+            for (int[] dir : DIRS) {
+                int nx = cx + dir[0];
+                int ny = cy + dir[1];
+                if (state.isWrapped) {
+                    nx = (nx % W + W) % W;
+                    ny = (ny % H + H) % H;
+                }
+                if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+                if (state.blocked[nx][ny]) continue;
+                if (dist[nx][ny] != -1) continue;
+
+                dist[nx][ny] = d + 1;
+                owner[nx][ny] = o;
+                q.add(new int[]{nx, ny});
+            }
+        }
+        return myCount;
     }
 
     // ============================================================
