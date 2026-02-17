@@ -282,13 +282,24 @@ public class Snake {
         Queue<Point> q = new LinkedList<>();
         int sx = start.x, sy = start.y;
         if (isWrapped) { sx = (sx % W + W) % W; sy = (sy % H + H) % H; }
-        if (sx >= 0 && sx < W && sy >= 0 && sy < H && !v[sx][sy]) {
-            q.add(new Point(sx, sy)); v[sx][sy] = true;
+        
+        // FIX: Do NOT check !v[sx][sy] for the start point. 
+        // We are ON the start point, so we count it and explore from it, 
+        // even if it's technically marked 'blocked' (which it is, by our own head).
+        if (sx >= 0 && sx < W && sy >= 0 && sy < H) {
+            q.add(new Point(sx, sy)); 
+            v[sx][sy] = true;
         }
+        
         int count = 0;
         while (!q.isEmpty()) {
-            Point p = q.poll(); count++;
+            Point p = q.poll(); 
+            // Don't count the start point itself as specific "free space" if current logic relies on it?
+            // Actually, usually flood fill counts reachable nodes.
+            // If we want space *available*, counting head is fine/negligible.
+            count++;
             if (count >= cap) return count;
+            
             for (int[] d : DIRS) {
                 int nx = p.x + d[0];
                 int ny = p.y + d[1];
