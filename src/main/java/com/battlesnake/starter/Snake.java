@@ -105,8 +105,32 @@ public class Snake {
                 continue;
             }
 
+            // === TOP-LEVEL SAFETY CHECK ===
+            // If this move puts us adjacent to a LARGER/EQUAL enemy head,
+            // they could move into us next turn = head-to-head death.
+            // Check all 4 directions the enemy could move to.
+            boolean headCollisionRisk = false;
+            for (SnakeData e : state.aliveEnemies) {
+                if (state.myLen > e.len) continue; // We win this collision
+                // Check if enemy head could reach 'next' in one move
+                for (int[] ed : DIRS) {
+                    Point enemyNext = e.head.add(ed);
+                    if (state.isWrapped) enemyNext = state.wrap(enemyNext);
+                    if (enemyNext.equals(next)) {
+                        headCollisionRisk = true;
+                        break;
+                    }
+                }
+                if (headCollisionRisk) break;
+            }
+
             // RECURSIVE SEARCH
             double score = search(state, next, depth, startTime);
+            
+            // Apply head-collision penalty AFTER search (so it stacks with eval)
+            if (headCollisionRisk) {
+                score -= 500_000.0; // Very bad, but not impossible (might be only option)
+            }
 
             if (score > maxScore) {
                 maxScore = score;
@@ -276,20 +300,14 @@ public class Snake {
                 // Hunt smaller snakes - closer = more reward
                 score += (1000.0 / (d + 1)) * W_AGGRESSION;
             } else if (state.myLen == e.len) {
-                // Equal size: avoid head-to-head (50/50 = bad odds)
-                if (d <= 2) {
-                    score -= 50_000.0;
-                }
+                // Equal size: slight avoidance (head-collision handled at top level)
+                if (d <= 2) score -= 5_000.0;
             } else {
-                // SMALLER than enemy: use gradient fear
-                // d=1: -100k, d=2: -20k, d=3: -10k, d=5+: minor
-                score -= 100_000.0 / (d * d + 1);
-            }
-
-            // EARLY GAME CAUTION: In the first 10 turns, be extra careful
-            // with ALL snakes that are equal or larger
-            if (state.turn < 10 && state.myLen <= e.len && d < 4) {
-                score -= 50_000.0;
+                // SMALLER than enemy: soft gradient avoidance
+                // d=1: -5000, d=2: -1000, d=3: -500, d=5+: ~200
+                // These are SOFT penalties — big enough to prefer safer moves,
+                // small enough to not make ALL scores negative
+                score -= 5_000.0 / (d + 1);
             }
         }
         return score;
