@@ -2,1501 +2,6 @@
     "hasMore":  true,
     "logs":  [
                  {
-                     "id":  "bdd759b7-5731-4be5-bd0c-9bf2c2dd18fc",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 233: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:04.38660447Z"
-                 },
-                 {
-                     "id":  "71351af7-09e0-4b51-be23-34c5b2b8b395",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 234: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:04.604408522Z"
-                 },
-                 {
-                     "id":  "a67ea708-3748-4c23-bacb-ffbf1be11df5",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 235: Best move left score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:04.871014572Z"
-                 },
-                 {
-                     "id":  "596da4cd-f4a6-4f57-8a07-0d2661123b7d",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 236: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:05.107417451Z"
-                 },
-                 {
-                     "id":  "ba670e82-8421-45f8-9a13-bffb3421f41d",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-21] INFO com.battlesnake.starter.Snake - Turn 237: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:05.323776833Z"
-                 },
-                 {
-                     "id":  "16eb5aee-a4dd-477d-9515-5929f6ff3f33",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 238: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:05.55622458Z"
-                 },
-                 {
-                     "id":  "369805bc-d6a4-4319-bd02-4ccf426e1c28",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 239: Best move left score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:05.776898342Z"
-                 },
-                 {
-                     "id":  "58b3c3f1-7a6f-4eea-8943-32d2f385d9a1",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 240: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:06.023131996Z"
-                 },
-                 {
-                     "id":  "e97bdafd-32a5-40fe-934b-e58ef8bce3c9",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 241: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:06.263419817Z"
-                 },
-                 {
-                     "id":  "c599d30c-39f0-4006-972a-846fc1e73b05",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 242: Best move up score -9702990.0 (1ms)",
-                     "timestamp":  "2026-02-17T10:31:06.500159303Z"
-                 },
-                 {
-                     "id":  "4d98fd86-013e-4eec-bbaa-5949ddf85de5",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 243: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:06.733863527Z"
-                 },
-                 {
-                     "id":  "56ba64fa-f883-4bcc-8d17-15c998f821ac",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-21] INFO com.battlesnake.starter.Snake - Turn 244: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:06.967431267Z"
-                 },
-                 {
-                     "id":  "972378c1-bb6d-4c3a-90c2-2e2ddd64437d",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 245: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:07.202976559Z"
-                 },
-                 {
-                     "id":  "ef702d5d-c2bf-4c87-9060-8973ccdc8135",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 246: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:07.444942844Z"
-                 },
-                 {
-                     "id":  "75cbdbd5-0b4f-4685-9866-c293eb328252",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 247: Best move right score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:07.647047009Z"
-                 },
-                 {
-                     "id":  "edeed7dc-bf80-485c-945a-b87d10421dd7",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 248: Best move down score -9702990.0 (1ms)",
-                     "timestamp":  "2026-02-17T10:31:07.896130103Z"
-                 },
-                 {
-                     "id":  "b622189c-fec6-486d-b179-60de1c272e28",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 249: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:08.103914386Z"
-                 },
-                 {
-                     "id":  "e47fcc83-7067-40b5-956a-a4efaa495a6c",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 250: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:08.329280715Z"
-                 },
-                 {
-                     "id":  "0d5d17d8-6ae8-43b2-b55c-9225d7a00551",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-21] INFO com.battlesnake.starter.Snake - Turn 251: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:08.563576211Z"
-                 },
-                 {
-                     "id":  "fa6278f7-d8a9-4215-ad5d-460be4df0526",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 252: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:08.774255344Z"
-                 },
-                 {
-                     "id":  "a922ce44-23c4-4460-8fa0-2ed3c9c38727",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 253: Best move down score -9702990.0 (1ms)",
-                     "timestamp":  "2026-02-17T10:31:08.994123399Z"
-                 },
-                 {
-                     "id":  "6b277358-5324-4e8d-b16c-5583c23cbf09",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 254: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:09.216892104Z"
-                 },
-                 {
-                     "id":  "f3cc133d-824a-4cf9-92fe-f136d8225935",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-21] INFO com.battlesnake.starter.Snake - Turn 255: Best move left score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:09.442405317Z"
-                 },
-                 {
-                     "id":  "bbd10342-dcb4-4c95-a852-7228da43d278",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 256: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:09.68380319Z"
-                 },
-                 {
-                     "id":  "0fb3f730-b0a4-4e1b-a9cd-6286a8cb8a0d",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 257: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:09.922727692Z"
-                 },
-                 {
-                     "id":  "d7dc0d0c-0a47-4248-a5b0-73f8f3531fe6",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 258: Best move up score -9702990.0 (1ms)",
-                     "timestamp":  "2026-02-17T10:31:10.193188342Z"
-                 },
-                 {
-                     "id":  "3232722e-7978-4963-aa15-614f6ce2b7b7",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 259: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:10.463050489Z"
-                 },
-                 {
-                     "id":  "0aeaa748-bae4-4f02-ba9f-5644e3c9c8d7",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 260: Best move up score 1.0E8 (0ms)",
-                     "timestamp":  "2026-02-17T10:31:10.707503807Z"
-                 },
-                 {
-                     "id":  "b1c8e975-8b4b-4f34-b204-3f71849a6bf2",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 0: Best move up score -9801000.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:34:21.21911632Z"
-                 },
-                 {
-                     "id":  "52deaffd-96bf-4de7-b696-09497c81f55f",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 1: Best move up score -9801000.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:34:21.577824032Z"
-                 },
-                 {
-                     "id":  "ee8f3bfe-2297-4896-bb1d-b633941f0305",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 2: Best move up score -9801000.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:34:21.900551374Z"
-                 },
-                 {
-                     "id":  "55fb99d9-4ee9-4a67-8f4f-9e8f9ba4cc40",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 3: Best move up score -9801000.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:34:22.212565323Z"
-                 },
-                 {
-                     "id":  "b8c8ea9b-0085-4754-a5c7-4a97459736e7",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 4: Best move up score -9801000.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:34:22.525403579Z"
-                 },
-                 {
-                     "id":  "cc2c03b8-455f-4ce5-92dd-d54e5f7fb893",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-21] INFO com.battlesnake.starter.Snake - Turn 5: Best move up score -9801000.0 (1ms)",
-                     "timestamp":  "2026-02-17T10:34:22.83322143Z"
-                 },
-                 {
-                     "id":  "056d45b8-f758-4fa3-bbdf-d20ed255b1d0",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 6: Best move up score -9801000.0 (1ms)",
-                     "timestamp":  "2026-02-17T10:34:23.14533639Z"
-                 },
-                 {
-                     "id":  "2c8846d2-8950-407b-8fa8-0f611a88d052",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 7: Best move up score -9801000.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:34:23.488214333Z"
-                 },
-                 {
-                     "id":  "3167d746-a828-439a-9e6e-b29791612600",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 8: Best move up score -9801000.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:34:23.817669015Z"
-                 },
-                 {
-                     "id":  "8731203d-26da-42ae-8a7c-bbf5ebb09973",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 9: Best move left score -9801000.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:34:24.106679384Z"
-                 },
-                 {
-                     "id":  "ecdbca70-9d5a-4f1b-adca-e9e0cd347a75",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 10: Best move down score -9801000.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:34:24.436078905Z"
-                 },
-                 {
-                     "id":  "5d838b2d-ffcc-480c-8570-c9ab1478d5a8",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 11: Best move down score -9801000.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:34:24.752374493Z"
-                 },
-                 {
-                     "id":  "b98a1b46-d6d9-4d5d-bb50-739cc2143590",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-21] INFO com.battlesnake.starter.Snake - Turn 0: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:07.150116619Z"
-                 },
-                 {
-                     "id":  "a0f9c095-830f-4502-82a3-e9362997526c",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 1: Best move left score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:07.451237063Z"
-                 },
-                 {
-                     "id":  "58800da3-4b92-4dc7-a3c3-32bdde4f6d9e",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 2: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:07.787154744Z"
-                 },
-                 {
-                     "id":  "ddef0252-fe61-483d-a1d0-308bdeaac0cd",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 3: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:08.163388196Z"
-                 },
-                 {
-                     "id":  "69489f8a-41db-4ee3-8c82-4f3858e1598f",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 4: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:08.532981209Z"
-                 },
-                 {
-                     "id":  "2af1b0b5-29b2-428f-9f88-d8c4269f491a",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 5: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:08.952705529Z"
-                 },
-                 {
-                     "id":  "103832b0-3f24-4f29-b09e-725221fe2acd",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 6: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:09.255477227Z"
-                 },
-                 {
-                     "id":  "4be019e7-2c28-437d-8b91-e3564884914c",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 7: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:09.533485579Z"
-                 },
-                 {
-                     "id":  "b958d62e-70e4-4115-9b74-2f030d4783b6",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 8: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:09.849052985Z"
-                 },
-                 {
-                     "id":  "aa73531f-da53-481a-9cac-9e616e4ec162",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-21] INFO com.battlesnake.starter.Snake - Turn 9: Best move down score -9702990.0 (1ms)",
-                     "timestamp":  "2026-02-17T10:39:10.134752278Z"
-                 },
-                 {
-                     "id":  "2f5af802-62fc-4a3d-aa59-437d1abaa9db",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 10: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:10.451452957Z"
-                 },
-                 {
-                     "id":  "76fa4864-48ed-408c-b4c8-f735b3916597",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 11: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:10.733734078Z"
-                 },
-                 {
-                     "id":  "da5b193d-63ce-441a-a058-3b9d01ec1035",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 12: Best move right score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:11.049829095Z"
-                 },
-                 {
-                     "id":  "3ed577b2-11fe-451b-8182-966f5abc54b9",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 13: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:11.402623948Z"
-                 },
-                 {
-                     "id":  "ee165d18-1b9c-418e-909c-0154c970665d",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 14: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:11.681020728Z"
-                 },
-                 {
-                     "id":  "00b994e1-016c-4355-81cb-8ef9d5c7c47b",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 15: Best move up score -9702990.0 (1ms)",
-                     "timestamp":  "2026-02-17T10:39:12.03616142Z"
-                 },
-                 {
-                     "id":  "2b779eb5-b4ef-4a57-8a34-4504c16b55b9",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 16: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:12.337024629Z"
-                 },
-                 {
-                     "id":  "ecbf1065-3428-4d47-aaa9-4b62e1a68d65",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 17: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:12.636020349Z"
-                 },
-                 {
-                     "id":  "846dec92-91c1-42e1-95cb-d578bb025692",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 18: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:13.004227933Z"
-                 },
-                 {
-                     "id":  "ccb34a3e-7852-4db7-8b0f-e4f43c6ebad6",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 19: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:13.285962833Z"
-                 },
-                 {
-                     "id":  "71e4aa02-c8a8-4d9a-886b-2ec77e6e7066",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 20: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:13.582634885Z"
-                 },
-                 {
-                     "id":  "80f1da3b-1a30-4a46-8c96-ae0344971281",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 21: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:13.867756505Z"
-                 },
-                 {
-                     "id":  "dbe497ab-082a-4467-9670-1e71d33ccf96",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 22: Best move up score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:14.136543955Z"
-                 },
-                 {
-                     "id":  "7462ebc1-5b58-42f0-a906-7927436b11ea",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 23: Best move left score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:14.532276294Z"
-                 },
-                 {
-                     "id":  "42988f46-2e4d-4075-b040-f40321a04113",
-                     "labels":  [
-                                    {
-                                        "name":  "resource",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
-                                    },
-                                    {
-                                        "name":  "instance",
-                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
-                                    },
-                                    {
-                                        "name":  "level",
-                                        "value":  "info"
-                                    },
-                                    {
-                                        "name":  "type",
-                                        "value":  "app"
-                                    }
-                                ],
-                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 24: Best move down score -9702990.0 (0ms)",
-                     "timestamp":  "2026-02-17T10:39:14.849572786Z"
-                 },
-                 {
                      "id":  "8f46e016-14f2-4d35-8c82-bc90c00d1aed",
                      "labels":  [
                                     {
@@ -4600,8 +3105,1431 @@
                                 ],
                      "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 14: Best move up score -9702990.0 (0ms)",
                      "timestamp":  "2026-02-17T10:45:10.532401377Z"
+                 },
+                 {
+                     "id":  "32065e5d-62bb-4d5a-8afe-3fa13c7df6f7",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 0: Best move up score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:09.131588804Z"
+                 },
+                 {
+                     "id":  "a096eb2a-67fc-48bd-8540-a1b9cab42abf",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 1: Best move up score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:09.727037982Z"
+                 },
+                 {
+                     "id":  "c882a5ac-1876-4518-a12b-409efe3a1966",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 2: Best move up score -9801000.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:49:10.322218244Z"
+                 },
+                 {
+                     "id":  "2bc9cb19-c824-4319-aea9-a9e0fb94f70a",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-21] INFO com.battlesnake.starter.Snake - Turn 3: Best move up score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:10.938292094Z"
+                 },
+                 {
+                     "id":  "cfbcb897-fad7-428b-86f6-4b5e4d1ff7f5",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 4: Best move up score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:11.562589617Z"
+                 },
+                 {
+                     "id":  "1fb26bf6-a550-4e0b-8f1e-3c8e39e5399d",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 5: Best move left score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:12.186567543Z"
+                 },
+                 {
+                     "id":  "8fbd149e-4093-4daf-92b8-344daf069f34",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 6: Best move down score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:12.782370839Z"
+                 },
+                 {
+                     "id":  "164ba490-0605-46ec-9020-d80e3385863c",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 7: Best move down score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:13.376951208Z"
+                 },
+                 {
+                     "id":  "ea9f7088-10f9-4d43-a774-4d1050027a12",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 8: Best move down score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:13.993065319Z"
+                 },
+                 {
+                     "id":  "b411572b-aa0a-4e66-a054-f2347e6bb064",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 9: Best move down score -9801000.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:49:14.607193769Z"
+                 },
+                 {
+                     "id":  "89455512-846d-428b-a179-221dcfdb5b82",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 10: Best move down score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:15.190146244Z"
+                 },
+                 {
+                     "id":  "48f88913-8344-4ce9-b120-d44722e86ba9",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 11: Best move down score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:16.247615091Z"
+                 },
+                 {
+                     "id":  "0edb93d3-7dd8-41fc-adba-ffd420d238d7",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 12: Best move left score -9801000.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:49:16.865226234Z"
+                 },
+                 {
+                     "id":  "f0259352-6c26-4055-8c53-b218d579f3e1",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 0: Best move up score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:52:57.574865149Z"
+                 },
+                 {
+                     "id":  "b8c928b5-a97b-45e1-9911-497b9499858f",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 1: Best move up score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:52:57.784390064Z"
+                 },
+                 {
+                     "id":  "0eb40f9e-2eff-4850-84e0-0c81d14b73b4",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 2: Best move up score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:52:58.002633851Z"
+                 },
+                 {
+                     "id":  "a7fe7ad5-cf3d-4f32-b704-aabaf433351c",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 3: Best move up score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:52:58.203611146Z"
+                 },
+                 {
+                     "id":  "14256313-dca0-4d08-a10d-331d12e9c409",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 4: Best move up score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:52:58.457179035Z"
+                 },
+                 {
+                     "id":  "a0c3c5b4-bd10-49c4-8306-4cd6bcb008cc",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 5: Best move left score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:52:58.658963747Z"
+                 },
+                 {
+                     "id":  "4168a74a-3c3a-4c20-b7e7-82a68783f8f9",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 6: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:52:58.902690509Z"
+                 },
+                 {
+                     "id":  "093fc75a-d3cb-4c27-9cf3-c248ac120925",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 7: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:52:59.182918616Z"
+                 },
+                 {
+                     "id":  "280a60e7-a190-47c6-a7a9-62d6141ef8b7",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 8: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:52:59.351033792Z"
+                 },
+                 {
+                     "id":  "b338b24d-4985-45fc-baf8-7ea5546bccd7",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 9: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:52:59.545696525Z"
+                 },
+                 {
+                     "id":  "0fb48f4a-b9c1-4b91-876d-087e2332961b",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-21] INFO com.battlesnake.starter.Snake - Turn 10: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:52:59.789066919Z"
+                 },
+                 {
+                     "id":  "4fb69d17-ddd4-4472-9551-2718e6c4a96b",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-17] INFO com.battlesnake.starter.Snake - Turn 11: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:52:59.986115922Z"
+                 },
+                 {
+                     "id":  "63209b22-61f7-4455-a8ef-9c84c381a9b3",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-10] INFO com.battlesnake.starter.Snake - Turn 12: Best move down score -9702990.0 (2ms)",
+                     "timestamp":  "2026-02-17T10:53:00.186425954Z"
+                 },
+                 {
+                     "id":  "56c606c6-9746-407d-aedc-01a6e9d56df3",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-14] INFO com.battlesnake.starter.Snake - Turn 13: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:53:00.396974849Z"
+                 },
+                 {
+                     "id":  "2aa4a93f-6eb4-4c83-a5f9-0c61540bc29a",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-16] INFO com.battlesnake.starter.Snake - Turn 14: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:53:00.60391651Z"
+                 },
+                 {
+                     "id":  "75631499-59c9-4184-baed-5ae83b839892",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-20] INFO com.battlesnake.starter.Snake - Turn 15: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:53:00.88283346Z"
+                 },
+                 {
+                     "id":  "8429077c-7176-416d-ac8f-58c6618d121d",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-l9s98"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp959234857-13] INFO com.battlesnake.starter.Snake - Turn 16: Best move left score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:53:01.082342294Z"
+                 },
+                 {
+                     "id":  "d6a4hucr85hc73dmekqg",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "\u001b[0;34m\u001b[1m==\u003e \u001b[0m\u001b[1mDeploying...\u001b[0m",
+                     "timestamp":  "2026-02-17T10:53:39.305430994Z"
+                 },
+                 {
+                     "id":  "d6a4hucr85hc73dmekq0",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "\u001b[0;34m\u001b[1m==\u003e \u001b[0m\u001b[1mSetting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance\u001b[0m",
+                     "timestamp":  "2026-02-17T10:53:39.544477758Z"
+                 },
+                 {
+                     "id":  "c0ea5c4e-339a-4944-8b44-822d33ec42ec",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[Thread-0] INFO org.eclipse.jetty.util.log - Logging initialized @3098ms to org.eclipse.jetty.util.log.Slf4jLog",
+                     "timestamp":  "2026-02-17T10:54:06.815121711Z"
+                 },
+                 {
+                     "id":  "7af58fcf-843d-4842-bee8-75637d5e2685",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[Thread-0] INFO spark.embeddedserver.jetty.EmbeddedJettyServer - == Spark has ignited ...",
+                     "timestamp":  "2026-02-17T10:54:07.614405211Z"
+                 },
+                 {
+                     "id":  "90a05c22-3406-4780-bb0d-5bcc902b7b93",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[Thread-0] INFO spark.embeddedserver.jetty.EmbeddedJettyServer - \u003e\u003e Listening on 0.0.0.0:10000",
+                     "timestamp":  "2026-02-17T10:54:07.701623426Z"
+                 },
+                 {
+                     "id":  "597ab072-797e-4a71-95d7-5f7db18d5bef",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[Thread-0] INFO org.eclipse.jetty.server.Server - jetty-9.4.31.v20200723; built: 2020-07-23T17:57:36.812Z; git: 450ba27947e13e66baa8cd1ce7e85a4461cacc1d; jvm 1.8.0_482-b08",
+                     "timestamp":  "2026-02-17T10:54:07.707319009Z"
+                 },
+                 {
+                     "id":  "ff098b67-5f29-40cd-a890-8fb99788c1a7",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[Thread-0] INFO org.eclipse.jetty.server.session - DefaultSessionIdManager workerName=node0",
+                     "timestamp":  "2026-02-17T10:54:08.00741492Z"
+                 },
+                 {
+                     "id":  "5f2c1629-e6b6-4218-9381-33c11b1a0e54",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[Thread-0] INFO org.eclipse.jetty.server.session - No SessionScavenger set, using defaults",
+                     "timestamp":  "2026-02-17T10:54:08.00744069Z"
+                 },
+                 {
+                     "id":  "8522c4c9-5049-4f37-9128-f0bf272f0c1f",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[Thread-0] INFO org.eclipse.jetty.server.session - node0 Scavenging every 660000ms",
+                     "timestamp":  "2026-02-17T10:54:08.00980597Z"
+                 },
+                 {
+                     "id":  "23b9ae86-3799-48c7-88d6-a6f3b16c7c03",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[Thread-0] INFO org.eclipse.jetty.server.AbstractConnector - Started ServerConnector@37a39d83{HTTP/1.1, (http/1.1)}{0.0.0.0:10000}",
+                     "timestamp":  "2026-02-17T10:54:08.205142715Z"
+                 },
+                 {
+                     "id":  "e1af1deb-4e13-45d7-ba00-b10e3d927610",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[Thread-0] INFO org.eclipse.jetty.server.Server - Started @4593ms",
+                     "timestamp":  "2026-02-17T10:54:08.205475233Z"
+                 },
+                 {
+                     "id":  "d6a4hucr85hc73dmekpg",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "\u001b[0;32m\u001b[1m==\u003e \u001b[0m\u001b[1mYour service is live 🎉\u001b[0m",
+                     "timestamp":  "2026-02-17T10:54:10.741278229Z"
+                 },
+                 {
+                     "id":  "d6a4hucr85hc73dmekp0",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "\u001b[0;32m\u001b[1m==\u003e \u001b[0m\u001b[1m\u001b[0m",
+                     "timestamp":  "2026-02-17T10:54:10.972217254Z"
+                 },
+                 {
+                     "id":  "d6a4hucr85hc73dmekog",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "\u001b[0;32m\u001b[1m==\u003e \u001b[0m\u001b[1m///////////////////////////////////////////////////////////\u001b[0m",
+                     "timestamp":  "2026-02-17T10:54:10.974671724Z"
+                 },
+                 {
+                     "id":  "d6a4hucr85hc73dmeko0",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "\u001b[0;32m\u001b[1m==\u003e \u001b[0m\u001b[1m\u001b[0m",
+                     "timestamp":  "2026-02-17T10:54:10.977457123Z"
+                 },
+                 {
+                     "id":  "d6a4hucr85hc73dmekng",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "\u001b[0;32m\u001b[1m==\u003e \u001b[0m\u001b[1mAvailable at your primary URL https://battlesnake-0xpx.onrender.com\u001b[0m",
+                     "timestamp":  "2026-02-17T10:54:10.979938774Z"
+                 },
+                 {
+                     "id":  "d6a4hucr85hc73dmekn0",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "\u001b[0;32m\u001b[1m==\u003e \u001b[0m\u001b[1m\u001b[0m",
+                     "timestamp":  "2026-02-17T10:54:10.982397274Z"
+                 },
+                 {
+                     "id":  "d6a4hucr85hc73dmekmg",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "\u001b[0;32m\u001b[1m==\u003e \u001b[0m\u001b[1m///////////////////////////////////////////////////////////\u001b[0m",
+                     "timestamp":  "2026-02-17T10:54:10.986724017Z"
+                 },
+                 {
+                     "id":  "2feaca65-bfe1-4f58-bd06-636a08bc4cfa",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-17] INFO com.battlesnake.starter.Snake - Turn 0: Best move down score -45701.0829 (95ms)",
+                     "timestamp":  "2026-02-17T10:54:11.2028876Z"
+                 },
+                 {
+                     "id":  "d863b5f1-8292-4b54-9dba-c57d13741d72",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-16] INFO com.battlesnake.starter.Snake - Turn 1: Best move left score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:54:11.355634983Z"
+                 },
+                 {
+                     "id":  "e9bf9c28-d36b-4891-a23a-1153cc4c2996",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-13] INFO com.battlesnake.starter.Snake - Turn 2: Best move up score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:54:11.504979821Z"
+                 },
+                 {
+                     "id":  "0b9d0059-b01b-4473-a68e-cae03da9219b",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-10] INFO com.battlesnake.starter.Snake - Turn 3: Best move up score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:54:11.652615625Z"
+                 },
+                 {
+                     "id":  "e6d46e2f-1b9f-466f-9998-7960abe6223e",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-12] INFO com.battlesnake.starter.Snake - Turn 4: Best move up score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:54:11.817091183Z"
+                 },
+                 {
+                     "id":  "00435341-7f29-48d5-aa6f-8a904e94631f",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-15] INFO com.battlesnake.starter.Snake - Turn 5: Best move up score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:54:11.979992812Z"
+                 },
+                 {
+                     "id":  "15954b42-5086-4b21-ac91-7779f88917ec",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-14] INFO com.battlesnake.starter.Snake - Turn 6: Best move up score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:54:12.205953457Z"
+                 },
+                 {
+                     "id":  "61793247-3c93-43b3-9371-166e70363674",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-17] INFO com.battlesnake.starter.Snake - Turn 7: Best move up score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:54:12.36147389Z"
+                 },
+                 {
+                     "id":  "6319977e-72e8-4a46-8245-2b5b1ef83637",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-16] INFO com.battlesnake.starter.Snake - Turn 8: Best move up score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:54:12.508457878Z"
+                 },
+                 {
+                     "id":  "3d732f5e-36b2-48dd-b80f-4410c28b427c",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-13] INFO com.battlesnake.starter.Snake - Turn 9: Best move up score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:54:12.66273942Z"
+                 },
+                 {
+                     "id":  "b5b3d107-5ef3-4ec8-914e-02bf13134a02",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-10] INFO com.battlesnake.starter.Snake - Turn 10: Best move up score -9702990.0 (2ms)",
+                     "timestamp":  "2026-02-17T10:54:12.821872744Z"
+                 },
+                 {
+                     "id":  "f1ea79ec-69db-490a-bdbe-28c696030eb1",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-12] INFO com.battlesnake.starter.Snake - Turn 11: Best move up score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:54:13.004766106Z"
+                 },
+                 {
+                     "id":  "a73d8d63-6638-4d08-8826-89e2681c824c",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-15] INFO com.battlesnake.starter.Snake - Turn 12: Best move left score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:54:13.22394251Z"
+                 },
+                 {
+                     "id":  "8d7af181-e2fb-4728-aec7-16dbd0c5c7fd",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-14] INFO com.battlesnake.starter.Snake - Turn 13: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:54:13.396575114Z"
+                 },
+                 {
+                     "id":  "6cb3e6cd-e941-4ab8-9c75-9a29ca34295b",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-17] INFO com.battlesnake.starter.Snake - Turn 14: Best move down score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:54:13.559644817Z"
+                 },
+                 {
+                     "id":  "a9ac8885-c2f2-475a-badc-870fa9ed6942",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-16] INFO com.battlesnake.starter.Snake - Turn 15: Best move down score -9702990.0 (1ms)",
+                     "timestamp":  "2026-02-17T10:54:13.746649972Z"
+                 },
+                 {
+                     "id":  "eede9ddc-0cce-4577-b258-834b2c6c2fc5",
+                     "labels":  [
+                                    {
+                                        "name":  "resource",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0"
+                                    },
+                                    {
+                                        "name":  "instance",
+                                        "value":  "srv-d66tmo15pdvs73c5j9t0-khltm"
+                                    },
+                                    {
+                                        "name":  "level",
+                                        "value":  "info"
+                                    },
+                                    {
+                                        "name":  "type",
+                                        "value":  "app"
+                                    }
+                                ],
+                     "message":  "[qtp309411659-13] INFO com.battlesnake.starter.Snake - Turn 16: Best move down score -9702990.0 (0ms)",
+                     "timestamp":  "2026-02-17T10:54:13.955541677Z"
                  }
              ],
-    "nextEndTime":  "2026-02-17T10:31:04.38660447Z",
-    "nextStartTime":  "2026-02-10T10:46:52.225724089Z"
+    "nextEndTime":  "2026-02-17T10:39:15.089307229Z",
+    "nextStartTime":  "2026-02-10T10:54:49.34393151Z"
 }

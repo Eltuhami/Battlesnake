@@ -422,24 +422,41 @@ public class Snake {
         void advanceMySnake(Point nextHead) {
             if (isWrapped) nextHead = wrap(nextHead);
             
-            // Check death BEFORE we move/mark
-            // If we hit a blocked cell (body/wall), we die.
+            // 1. Determine if we are growing (eating food)
+            boolean growing = foods.contains(nextHead);
+            
+            // 2. Optimistic Tail Unblocking:
+            // If we are NOT growing, our tail spot will be free at the end of this turn.
+            // We unmark it NOW so that 'nextHead' can validly be the current tail position.
+            Point tail = null;
+            if (!growing && !myBody.isEmpty()) {
+                tail = myBody.get(myBody.size() - 1);
+                unmarkBlocked(tail);
+            }
+
+            // 3. Check for death (Collision)
+            // If we hit a blocked cell (body/wall/etc), we die.
+            // Note: 'tail' is now unblocked, so hitting it is allowed.
             if (!isValid(nextHead) || blocked[nextHead.x][nextHead.y]) {
                 myHealth = 0; // Mark as dead
+                // Revert tail unblock if we died (clean state)
+                if (tail != null) markBlocked(tail);
             } else {
                 myHealth--;
                 myBody.add(0, nextHead); // Add new head
                 markBlocked(nextHead);   // Mark new head as blocked
                 
-                if (foods.contains(nextHead)) {
+                if (growing) {
                      myLen++;
                      myHealth = 100;
                      foods.remove(nextHead);
+                     // If we grew, we DO NOT remove the tail.
+                     // But we ALREADY unblocked it in Step 2! We must RE-BLOCK it.
+                     if (tail != null) markBlocked(tail);
                 } else {
-                    // Remove tail if not eating
+                    // Not growing. Tail already unblocked. Just remove from list.
                     if (!myBody.isEmpty()) {
-                        Point tail = myBody.remove(myBody.size() - 1);
-                        unmarkBlocked(tail);
+                        myBody.remove(myBody.size() - 1);
                     }
                 }
             }
@@ -449,6 +466,13 @@ public class Snake {
     void advanceEnemiesPredictively() {
             // For each enemy, pick their BEST immediate move and execute it.
             for (SnakeData e : aliveEnemies) {
+                // 1. Unblock tail optimistically (assuming no growth yet)
+                Point tail = null;
+                if (!e.body.isEmpty()) {
+                    tail = e.body.get(e.body.size() - 1);
+                    unmarkBlocked(tail);
+                }
+
                 // Heuristic choice for enemy
                 Point bestEMove = null;
                 double bestEScore = -Double.MAX_VALUE;
@@ -484,18 +508,19 @@ public class Snake {
                     if (foods.contains(bestEMove)) {
                         e.len++;
                         e.health = 100;
-                        foods.remove(bestEMove); // Contest? First come first serve logic effectively
+                        foods.remove(bestEMove); 
+                        // Enemy grew. Re-block the tail we optimistically unblocked.
+                        if (tail != null) markBlocked(tail);
                     } else {
-                        // Remove tail
+                        // Not growing. Tail already unblocked. Just remove from list.
                         if (!e.body.isEmpty()) {
-                            Point tail = e.body.remove(e.body.size() - 1);
-                            unmarkBlocked(tail);
+                            e.body.remove(e.body.size() - 1);
                         }
                     }
                 } else {
-                    // Enemy dies (trapped) - We could remove their body from blocked here to be precise,
-                    // but keeping them as obstacles is also a valid "dead body" strategy for this turn.
-                    // For now, do nothing.
+                    // Enemy dies (trapped)
+                    // We optimistically unblocked tail. Re-block it to maintain static obstacle.
+                    if (tail != null) markBlocked(tail);
                 }
             }
         }
