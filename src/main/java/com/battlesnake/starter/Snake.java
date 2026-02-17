@@ -262,9 +262,18 @@ public class Snake {
         for (SnakeData e : state.aliveEnemies) {
             int d = state.dist(next, e.head);
             if (state.myLen > e.len) {
+                // Hunt smaller snakes
                 score += (1000.0 / (d + 1)) * W_AGGRESSION;
             } else {
-                score += d * 5.0; 
+                // Avoid larger/equal snakes
+                if (d < 3) {
+                    // DANGER ZONE: If we are close to a larger head, PANIC.
+                    // This prevents 1v1 suicide and head-to-heads we shouldn't take.
+                    score -= 10_000_000.0; 
+                } else {
+                    // Keep distance (Small bonus for being far)
+                    score += d * 5.0; 
+                }
             }
         }
         return score;
