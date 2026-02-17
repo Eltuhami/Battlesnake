@@ -29,9 +29,9 @@ public class Snake {
     private static final double SCORE_WIN           =  100_000_000.0;
 
     // Strategy weights (V23 Standard)
-    private static final double W_SPACE      = 20.0;
-    private static final double W_AGGRESSION = 30.0;
-    private static final double W_CENTER     = 10.0;
+    private static final double W_SPACE      = 10.0;
+    private static final double W_AGGRESSION = 50.0;
+    private static final double W_CENTER     = 5.0;
 
     // History for Boredom System
     private static final LinkedList<Point> HISTORY = new LinkedList<>();
@@ -172,10 +172,6 @@ public class Snake {
     // EVALUATE
     // ============================================================
 
-    // ============================================================
-    // EVALUATE
-    // ============================================================
-
     private static double evaluate(GameState state, Point myHead) {
         // CONSTRICTOR OVERRIDE
         if (state.isConstrictor) {
@@ -184,7 +180,7 @@ public class Snake {
 
         double score = 0;
 
-        // 1. SPACE (Freedom) - Reverted to Flood Fill for stability
+        // 1. SPACE (Freedom)
         int space = floodFillGrid(state.W, state.H, state.isWrapped, myHead, state.blocked, state.myLen * 3);
         if (space < state.myLen) return SCORE_CERTAIN_DEATH + space * 1000;
         score += space * W_SPACE;
@@ -233,15 +229,6 @@ public class Snake {
 
          return score;
     }
-
-    // ============================================================
-    // SCORING HELPERS
-    // ============================================================
-    
-    // Strategy weights (V23 Standard)
-    private static final double W_SPACE      = 10.0;
-    private static final double W_AGGRESSION = 50.0;
-    private static final double W_CENTER     = 5.0;
 
     // ============================================================
     // SCORING HELPERS
