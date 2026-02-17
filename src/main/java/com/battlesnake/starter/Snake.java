@@ -321,6 +321,7 @@ public class Snake {
         int W, H, turn;
         int myHealth, myLen;
         Point myHead;
+        List<Point> myBody = new ArrayList<>(); // Added to track my body
         boolean[][] blocked;
         boolean[][] hazards;
         boolean isConstrictor, isWrapped;
@@ -339,6 +340,11 @@ public class Snake {
             myLen = you.get("body").size();
             myHead = new Point(you.get("head").get("x").asInt(), you.get("head").get("y").asInt());
             
+            // Init myBody
+            for (JsonNode b : you.get("body")) {
+                myBody.add(new Point(b.get("x").asInt(), b.get("y").asInt()));
+            }
+
             JsonNode game = root.get("game");
             String rules = "standard";
             if (game != null && game.has("ruleset")) {
@@ -391,6 +397,7 @@ public class Snake {
             GameState s = new GameState();
             s.W = W; s.H = H; s.turn = turn;
             s.myHealth = myHealth; s.myLen = myLen; s.myHead = myHead;
+            s.myBody = new ArrayList<>(myBody); // Deep copy body
             s.blocked = copyGrid(blocked, W, H);
             s.hazards = copyGrid(hazards, W, H); // deep copy hazards? usually static but safe
             s.isConstrictor = isConstrictor; s.isWrapped = isWrapped;
@@ -407,6 +414,11 @@ public class Snake {
             if (isValid(p)) blocked[p.x][p.y] = true;
         }
 
+        void unmarkBlocked(Point p) {
+            if (isWrapped) p = wrap(p);
+            if (isValid(p)) blocked[p.x][p.y] = false;
+        }
+
         void advanceMySnake(Point nextHead) {
             if (isWrapped) nextHead = wrap(nextHead);
             
@@ -416,15 +428,22 @@ public class Snake {
                 myHealth = 0; // Mark as dead
             } else {
                 myHealth--;
+                myBody.add(0, nextHead); // Add new head
+                markBlocked(nextHead);   // Mark new head as blocked
+                
                 if (foods.contains(nextHead)) {
                      myLen++;
                      myHealth = 100;
                      foods.remove(nextHead);
+                } else {
+                    // Remove tail if not eating
+                    if (!myBody.isEmpty()) {
+                        Point tail = myBody.remove(myBody.size() - 1);
+                        unmarkBlocked(tail);
+                    }
                 }
             }
-
             myHead = nextHead;
-            markBlocked(myHead); // Mark it now
         }
 
     void advanceEnemiesPredictively() {
@@ -458,10 +477,25 @@ public class Snake {
                 
                 if (bestEMove != null) {
                     e.head = bestEMove;
-                    e.body.add(0, bestEMove); // Update body reference
+                    e.body.add(0, bestEMove); // Add new head
                     markBlocked(bestEMove);
+                    
+                    // Check food for enemy (simplified: they eat if they land on it)
+                    if (foods.contains(bestEMove)) {
+                        e.len++;
+                        e.health = 100;
+                        foods.remove(bestEMove); // Contest? First come first serve logic effectively
+                    } else {
+                        // Remove tail
+                        if (!e.body.isEmpty()) {
+                            Point tail = e.body.remove(e.body.size() - 1);
+                            unmarkBlocked(tail);
+                        }
+                    }
                 } else {
-                    // Enemy dies (trapped)
+                    // Enemy dies (trapped) - We could remove their body from blocked here to be precise,
+                    // but keeping them as obstacles is also a valid "dead body" strategy for this turn.
+                    // For now, do nothing.
                 }
             }
         }
