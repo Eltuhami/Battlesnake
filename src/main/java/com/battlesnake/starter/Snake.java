@@ -251,7 +251,10 @@ public class Snake {
         double urgency = 1.0;
         if (state.myLen > maxELen + 2) urgency = 0.5;
         else if (state.myLen < maxELen) urgency = 3.0;
-        if (state.myHealth < 40) urgency = 10.0;
+        // Starvation prevention: escalating urgency as health drops
+        if (state.myHealth < 25) urgency = 20.0;      // CRITICAL: must eat NOW
+        else if (state.myHealth < 40) urgency = 10.0;  // Hungry
+        else if (state.myHealth < 60) urgency = 5.0;   // Getting low
         if (urgency < 0.5) urgency = 0.5;
 
         double best = 0;
@@ -278,9 +281,15 @@ public class Snake {
                     score -= 50_000.0;
                 }
             } else {
-                // SMALLER than enemy: use gradient fear, not cliff
-                // d=1: -100k (imminent death), d=2: -25k, d=3: -11k, d=4: -6k, d=5+: minor
+                // SMALLER than enemy: use gradient fear
+                // d=1: -100k, d=2: -20k, d=3: -10k, d=5+: minor
                 score -= 100_000.0 / (d * d + 1);
+            }
+
+            // EARLY GAME CAUTION: In the first 10 turns, be extra careful
+            // with ALL snakes that are equal or larger
+            if (state.turn < 10 && state.myLen <= e.len && d < 4) {
+                score -= 50_000.0;
             }
         }
         return score;
