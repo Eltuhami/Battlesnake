@@ -180,10 +180,18 @@ public class Snake {
 
         double score = 0;
 
-        // 1. SPACE (Freedom)
-        int space = floodFillGrid(state.W, state.H, state.isWrapped, myHead, state.blocked, state.myLen * 3);
+        // 1. SPACE (Freedom) - increased cap for better awareness
+        int space = floodFillGrid(state.W, state.H, state.isWrapped, myHead, state.blocked, state.W * state.H);
         if (space < state.myLen) return SCORE_CERTAIN_DEATH + space * 1000;
         score += space * W_SPACE;
+
+        // 1b. EDGE PENALTY - avoid walls when enemies are alive
+        if (!state.aliveEnemies.isEmpty()) {
+            int edgeDist = Math.min(Math.min(myHead.x, state.W - 1 - myHead.x),
+                                    Math.min(myHead.y, state.H - 1 - myHead.y));
+            if (edgeDist == 0) score -= 500.0;  // On the wall
+            else if (edgeDist == 1) score -= 200.0;  // One step from wall
+        }
 
         // 2. FOOD
         score += foodScore(state, myHead);
@@ -262,18 +270,17 @@ public class Snake {
         for (SnakeData e : state.aliveEnemies) {
             int d = state.dist(next, e.head);
             if (state.myLen > e.len) {
-                // Hunt smaller snakes
+                // Hunt smaller snakes - closer = more reward
                 score += (1000.0 / (d + 1)) * W_AGGRESSION;
-            } else {
-                // Avoid larger/equal snakes
-                if (d < 3) {
-                    // DANGER ZONE: If we are close to a larger head, PANIC.
-                    // This prevents 1v1 suicide and head-to-heads we shouldn't take.
-                    score -= 10_000_000.0; 
-                } else {
-                    // Keep distance (Small bonus for being far)
-                    score += d * 5.0; 
+            } else if (state.myLen == e.len) {
+                // Equal size: avoid head-to-head (50/50 = bad odds)
+                if (d <= 2) {
+                    score -= 50_000.0;
                 }
+            } else {
+                // SMALLER than enemy: use gradient fear, not cliff
+                // d=1: -100k (imminent death), d=2: -25k, d=3: -11k, d=4: -6k, d=5+: minor
+                score -= 100_000.0 / (d * d + 1);
             }
         }
         return score;
